@@ -7,6 +7,48 @@ agent: orchestrator
 
 Continue the workflow for feature: **$ARGUMENTS**
 
+## Input Validation (REQUIRED FIRST STEP)
+
+Before proceeding, validate all inputs:
+
+1. **Check Arguments Provided**
+   - If `$ARGUMENTS` is empty or contains only whitespace, STOP and inform the user:
+     ```
+     Error: No feature slug provided.
+     Usage: /workflow-continue <feature-slug>
+     
+     To see available workflows: /workflow-list
+     ```
+
+2. **Validate Slug Format**
+   - Must match pattern: `^[a-z0-9][a-z0-9-]*[a-z0-9]$` or single char `^[a-z0-9]$`
+   - Must NOT contain: `..`, `/`, `\`, spaces, or null bytes
+   - Maximum 50 characters
+   - If invalid format, STOP with error:
+     ```
+     Error: Invalid feature slug format.
+     Slugs must be lowercase alphanumeric with hyphens only.
+     ```
+
+3. **Verify Workflow Exists**
+   - Check if `workflow/$ARGUMENTS/workflow-state.json` exists
+   - If not found, STOP with error:
+     ```
+     Error: Workflow '$ARGUMENTS' not found.
+     
+     To see available workflows: /workflow-list
+     To start a new workflow: /workflow-start <description>
+     ```
+
+4. **Validate State File**
+   - Attempt to read and parse `workflow-state.json`
+   - If JSON is malformed, STOP with error:
+     ```
+     Error: Workflow state file is corrupted.
+     The file workflow/$ARGUMENTS/workflow-state.json contains invalid JSON.
+     Consider manual inspection or /workflow-reset $ARGUMENTS
+     ```
+
 ## Your Tasks
 
 1. **Load Workflow State**

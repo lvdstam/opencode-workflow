@@ -10,6 +10,48 @@ Initialize a new gated development workflow for the following feature:
 **Feature Description:**
 $ARGUMENTS
 
+## Input Validation (REQUIRED FIRST STEP)
+
+Before proceeding, validate all inputs:
+
+1. **Check Arguments Provided**
+   - If `$ARGUMENTS` is empty or contains only whitespace, STOP and inform the user:
+     ```
+     Error: No feature description provided.
+     Usage: /workflow-start <feature description>
+     Example: /workflow-start Add user authentication with email/password
+     ```
+
+2. **Validate Feature Description**
+   - Must be at least 10 characters (to ensure meaningful description)
+   - Must not exceed 500 characters
+   - If invalid, inform the user with requirements
+
+3. **Slug Validation Rules**
+   When creating the slug, enforce:
+   - Only lowercase alphanumeric characters and hyphens allowed
+   - No leading/trailing hyphens
+   - No consecutive hyphens
+   - Maximum 50 characters
+   - Must not be a reserved name: `workflow`, `all`, `status`, `list`, `help`
+   - Pattern: `^[a-z0-9][a-z0-9-]{0,48}[a-z0-9]$` (or single char `^[a-z0-9]$`)
+
+4. **Path Traversal Prevention**
+   - The slug must NOT contain: `..`, `/`, `\`, or null bytes
+   - Verify the constructed path stays within `workflow/` directory
+   - If any path component fails validation, STOP with error
+
+5. **Check for Existing Workflow**
+   - Check if `workflow/<slug>/` already exists
+   - If it exists, inform the user and suggest alternatives:
+     ```
+     Error: Workflow '<slug>' already exists.
+     Options:
+       - Use a different feature name
+       - Continue existing: /workflow-continue <slug>
+       - Check status: /workflow-status <slug>
+     ```
+
 ## Your Tasks
 
 1. **Create Feature Slug**

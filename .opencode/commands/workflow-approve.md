@@ -7,6 +7,34 @@ agent: orchestrator
 
 Human override to approve the current phase for: **$ARGUMENTS**
 
+## Input Validation (REQUIRED FIRST STEP)
+
+Before proceeding, validate all inputs:
+
+1. **Check Arguments Provided**
+   - If `$ARGUMENTS` is empty, STOP with error:
+     ```
+     Error: No feature slug provided.
+     Usage: /workflow-approve <feature-slug>
+     ```
+
+2. **Validate Slug Format**
+   - Must match pattern: `^[a-z0-9][a-z0-9-]*[a-z0-9]$` or single char `^[a-z0-9]$`
+   - Must NOT contain: `..`, `/`, `\`, spaces, or null bytes
+   - Maximum 50 characters
+
+3. **Verify Workflow Exists**
+   - Check if `workflow/$ARGUMENTS/workflow-state.json` exists
+   - If not found, STOP with helpful error
+
+4. **Verify Phase Can Be Approved**
+   - Check current phase status is not already "approved"
+   - If already approved, inform user:
+     ```
+     Current phase is already approved. 
+     Use /workflow-continue $ARGUMENTS to proceed.
+     ```
+
 ## Your Tasks
 
 1. **Load Current State**

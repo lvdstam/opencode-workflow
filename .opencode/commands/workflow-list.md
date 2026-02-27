@@ -8,6 +8,29 @@ subtask: true
 
 Display all feature workflows and their current status.
 
+## Error Handling
+
+This command should be resilient to partial failures:
+
+1. **Missing Workflow Directory**
+   - If `workflow/` directory doesn't exist, display:
+     ```
+     No workflows found. Start one with:
+       /workflow-start <feature description>
+     ```
+
+2. **Malformed State Files**
+   - If any `workflow-state.json` cannot be parsed:
+     - Log a warning for that specific workflow
+     - Continue processing other workflows
+     - Display partial information if possible:
+       ```
+       ⚠ <slug>: State file corrupted - run /workflow-status <slug> for details
+       ```
+
+3. **Permission Errors**
+   - If any directory is unreadable, log warning and skip
+
 ## Tasks
 
 1. **Scan Workflow Directory**

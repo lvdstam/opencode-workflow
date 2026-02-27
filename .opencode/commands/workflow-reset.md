@@ -5,14 +5,59 @@ agent: orchestrator
 
 # Override: Reset Phase
 
-Human override to reset a phase for: **$1** (feature slug)
+Human override to reset a workflow phase.
 
-Phase to reset: **$2** (phase name like "01-requirements")
+**Arguments:** $ARGUMENTS
+
+## Argument Parsing
+
+Parse the arguments as space-separated values:
+- **First argument**: Feature slug (required)
+- **Second argument**: Phase name (optional, e.g., "01-requirements", "02-architecture")
+
+Example usages:
+- `/workflow-reset user-auth` - Reset current phase of user-auth workflow
+- `/workflow-reset user-auth 02-architecture` - Reset specific phase
+- `/workflow-reset user-auth all` - Reset entire workflow
+
+## Input Validation (REQUIRED FIRST STEP)
+
+Before proceeding, validate all inputs:
+
+1. **Check Arguments Provided**
+   - Parse `$ARGUMENTS` into feature-slug and optional phase
+   - If no arguments provided, STOP with error:
+     ```
+     Error: No feature slug provided.
+     Usage: /workflow-reset <feature-slug> [phase]
+     
+     Examples:
+       /workflow-reset user-auth              # Reset current phase
+       /workflow-reset user-auth 02-architecture  # Reset specific phase
+       /workflow-reset user-auth all          # Reset entire workflow
+     ```
+
+2. **Validate Feature Slug**
+   - Must match pattern: `^[a-z0-9][a-z0-9-]*[a-z0-9]$` or single char `^[a-z0-9]$`
+   - Must NOT contain: `..`, `/`, `\`, spaces, or null bytes
+   - Maximum 50 characters
+
+3. **Validate Phase Name (if provided)**
+   - Must be one of: `01-requirements`, `02-architecture`, `03-implementation`, `04-testing`, `05-documentation`, `all`
+   - If invalid phase, STOP with error:
+     ```
+     Error: Invalid phase name.
+     Valid phases: 01-requirements, 02-architecture, 03-implementation, 04-testing, 05-documentation, all
+     ```
+
+4. **Verify Workflow Exists**
+   - Check if `workflow/<slug>/workflow-state.json` exists
+   - If not found, STOP with helpful error
 
 ## Your Tasks
 
 1. **Load Current State**
-   Read `workflow/$1/workflow-state.json`
+   Read `workflow/<slug>/workflow-state.json`
 
 2. **Confirm Reset**
    Tell the human:
@@ -21,7 +66,7 @@ Phase to reset: **$2** (phase name like "01-requirements")
    - What will be preserved vs deleted
 
 3. **Reset Phase State**
-   Update `workflow/$1/$2/status.json`:
+   Update `workflow/<slug>/<phase>/status.json`:
    ```json
    {
      "phase": "<phase>",
@@ -44,7 +89,7 @@ Phase to reset: **$2** (phase name like "01-requirements")
 6. **Begin Fresh**
    Start the creator/reviewer cycle from scratch
 
-## Options
+## Phase Argument Behavior
 
-If $2 is not provided, reset the current phase.
-If $2 is "all", reset all phases (start workflow over).
+- If phase argument is not provided, reset the current phase (from workflow-state.json)
+- If phase argument is "all", reset all phases (start workflow from beginning)

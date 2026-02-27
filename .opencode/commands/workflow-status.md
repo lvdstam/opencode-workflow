@@ -8,6 +8,44 @@ subtask: true
 
 Display the current status of the workflow for: **$ARGUMENTS**
 
+## Input Validation (REQUIRED FIRST STEP)
+
+Before proceeding, validate all inputs:
+
+1. **Check Arguments Provided**
+   - If `$ARGUMENTS` is empty or contains only whitespace, STOP and inform the user:
+     ```
+     Error: No feature slug provided.
+     Usage: /workflow-status <feature-slug>
+     
+     To see all workflows: /workflow-list
+     ```
+
+2. **Validate Slug Format**
+   - Must match pattern: `^[a-z0-9][a-z0-9-]*[a-z0-9]$` or single char `^[a-z0-9]$`
+   - Must NOT contain: `..`, `/`, `\`, spaces, or null bytes
+   - Maximum 50 characters
+   - If invalid format, STOP with error message
+
+3. **Verify Workflow Exists**
+   - Check if `workflow/$ARGUMENTS/workflow-state.json` exists
+   - If not found, STOP with error:
+     ```
+     Error: Workflow '$ARGUMENTS' not found.
+     
+     Available workflows:
+     [List any existing workflows or "No workflows found"]
+     
+     To start a new workflow: /workflow-start <description>
+     ```
+
+4. **Validate State File**
+   - If JSON is malformed, display warning but attempt partial display:
+     ```
+     Warning: Workflow state file may be corrupted.
+     Displaying available information...
+     ```
+
 ## Tasks
 
 1. **Load Workflow State**
