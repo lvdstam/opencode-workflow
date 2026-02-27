@@ -209,3 +209,50 @@ When invoking agents, always provide:
 3. **Artifact Preservation**: Never delete or overwrite review history
 4. **Clear Communication**: Always explain what you're doing and why
 5. **Human Authority**: Humans can override any decision or change any artifact
+
+## Error Handling
+
+### State File Errors
+
+If `workflow-state.json` or `status.json` is corrupted or missing:
+1. Attempt to reconstruct state from existing artifacts and git history
+2. If reconstruction fails, inform the human with:
+   - What file is corrupted/missing
+   - What state can be recovered
+   - Options: manual fix, reset phase, or reset workflow
+
+### Git Errors
+
+If a git operation fails:
+1. **Checkout fails**: Check for uncommitted changes, inform human
+2. **Commit fails**: Check if pre-commit hooks failed, show error
+3. **Push fails**: Check for network issues or upstream conflicts
+4. Never proceed with workflow if git state is uncertain
+
+### Agent Invocation Errors
+
+If a creator or reviewer agent fails to respond properly:
+1. Log the error in the phase status history
+2. Do NOT count as an iteration (agent failure ≠ review failure)
+3. Retry once automatically
+4. If retry fails, escalate to human with error details
+
+### Rollback Procedures
+
+**Phase Rollback** (when phase goes wrong):
+1. Save current artifacts to `<phase>/rollback-<timestamp>/`
+2. Reset `status.json` to last known good state
+3. Inform human what was rolled back and why
+
+**Workflow Recovery** (when state is corrupted):
+1. Read git log to find last successful phase commit
+2. Reconstruct workflow-state.json from commits
+3. Ask human to confirm reconstructed state before proceeding
+
+### Partial Failure Handling
+
+If an operation partially completes (e.g., artifact created but status not updated):
+1. Check for orphaned artifacts
+2. Attempt to reconcile state with artifacts
+3. Log inconsistency and inform human
+4. Do NOT proceed until state is consistent

@@ -206,3 +206,65 @@ Always update state files:
 3. When escalating to human
 4. When human provides override
 5. When workflow completes
+
+## State File Error Handling
+
+### Reading State Files
+
+When reading `workflow-state.json` or `status.json`:
+1. First verify the file exists
+2. Attempt to parse as JSON
+3. If parsing fails, the file is corrupted - do NOT proceed
+4. Validate required fields are present
+
+### Corrupted State Recovery
+
+If state file is corrupted or invalid:
+
+**For `workflow-state.json`:**
+1. Check if `00-feature/description.md` exists (proves valid workflow)
+2. Scan phase directories for `status.json` files
+3. Reconstruct workflow state from phase statuses
+4. Check git log for commit history:
+   ```
+   git log --oneline --grep="\[workflow\]"
+   ```
+5. Present reconstructed state to human for confirmation
+
+**For `status.json`:**
+1. Check for review files in `reviews/` directory
+2. Count reviews to determine iteration count
+3. Check last review for approval status
+4. Reconstruct status from available evidence
+
+### State Validation Rules
+
+A valid `workflow-state.json` must have:
+- `feature` (string, non-empty)
+- `current_phase` (string, valid phase name)
+- `status` (string, one of: in_progress, completed, escalated, abandoned)
+- `phases` (object with all 5 phases)
+
+A valid `status.json` must have:
+- `phase` (string, matches directory name)
+- `status` (string, valid status value)
+- `iterations` (number, 0-4)
+- `max_iterations` (number, typically 4)
+
+### Atomic State Updates
+
+To prevent partial writes:
+1. Read existing state file
+2. Create updated state in memory
+3. Validate new state before writing
+4. Write complete new state (not partial updates)
+5. Verify write succeeded by re-reading
+
+### Race Condition Prevention
+
+If multiple operations could modify state:
+1. Read state at start of operation
+2. Perform operation
+3. Re-read state before writing
+4. If state changed during operation, reconcile or abort
+5. Write reconciled state
