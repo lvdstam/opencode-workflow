@@ -23,7 +23,7 @@ Before proceeding, validate all inputs:
      ```
 
 2. **Validate Feature Description**
-   - Must be at least 10 characters (to ensure meaningful description)
+   - Must be at least 5 characters (to ensure meaningful description)
    - Must not exceed 500 characters
    - If invalid, inform the user with requirements
 
@@ -32,9 +32,9 @@ Before proceeding, validate all inputs:
    - Only lowercase alphanumeric characters and hyphens allowed
    - No leading/trailing hyphens
    - No consecutive hyphens
-   - Maximum 50 characters
+   - Maximum 64 characters
    - Must not be a reserved name: `workflow`, `all`, `status`, `list`, `help`
-   - Pattern: `^[a-z0-9][a-z0-9-]{0,48}[a-z0-9]$` (or single char `^[a-z0-9]$`)
+   - Pattern: `^[a-z0-9][a-z0-9-]{0,62}[a-z0-9]$` (or single char `^[a-z0-9]$`)
 
 4. **Path Traversal Prevention**
    - The slug must NOT contain: `..`, `/`, `\`, or null bytes

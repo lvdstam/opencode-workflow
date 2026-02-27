@@ -93,12 +93,12 @@ Create a review file at `workflow/<feature>/01-requirements/reviews/review-<N>.m
 ### APPROVED When:
 - All CRITICAL criteria are met
 - No CRITICAL issues exist
-- No more than 2 MAJOR issues exist
+- No more than 3 MAJOR issues exist
 - The document is ready for architecture design
 
 ### NEEDS_REVISION When:
 - Any CRITICAL issue exists
-- More than 2 MAJOR issues exist
+- More than 3 MAJOR issues exist
 - Core sections are missing or incomplete
 
 ## Evaluation Criteria

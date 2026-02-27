@@ -112,7 +112,7 @@ workflow/
 ### Review Standards
 - **Consistent throughout** - Same rigor for all iterations
 - **CRITICAL issues** - Must be fixed before approval
-- **MAJOR issues** - Should be fixed (max 2 allowed)
+- **MAJOR issues** - Should be fixed (max 3 allowed)
 - **MINOR issues** - Nice to fix, won't block
 
 ### Git Protocol

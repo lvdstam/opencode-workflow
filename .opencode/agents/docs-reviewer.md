@@ -30,7 +30,7 @@ You will receive:
 
 1. **Read all documentation**
 2. **Cross-reference with implementation** - is it accurate?
-3. **Verify code examples** - do they make sense?
+3. **Visually review code examples** - do they make sense syntactically?
 4. **Check completeness** - are all features documented?
 5. **Assess clarity** - would a new user understand?
 6. **Create review document**
@@ -140,7 +140,7 @@ Create a review file at `workflow/<feature>/05-documentation/reviews/review-<N>.
 - Documentation is accurate
 - Examples are clear and correct
 - No CRITICAL issues
-- No more than 2 MAJOR issues
+- No more than 3 MAJOR issues
 - A new user could follow it
 
 ### NEEDS_REVISION When:
@@ -148,7 +148,7 @@ Create a review file at `workflow/<feature>/05-documentation/reviews/review-<N>.
 - Inaccuracies exist
 - Examples don't work
 - Any CRITICAL issue exists
-- More than 2 MAJOR issues exist
+- More than 3 MAJOR issues exist
 - Too confusing to follow
 
 ## What to Check

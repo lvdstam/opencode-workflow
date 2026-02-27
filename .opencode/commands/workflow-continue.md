@@ -23,7 +23,7 @@ Before proceeding, validate all inputs:
 2. **Validate Slug Format**
    - Must match pattern: `^[a-z0-9][a-z0-9-]*[a-z0-9]$` or single char `^[a-z0-9]$`
    - Must NOT contain: `..`, `/`, `\`, spaces, or null bytes
-   - Maximum 50 characters
+   - Maximum 64 characters
    - If invalid format, STOP with error:
      ```
      Error: Invalid feature slug format.
@@ -77,6 +77,20 @@ Before proceeding, validate all inputs:
      - Provide specific guidance for the creator
      - Reset iterations and try again
      - Abandon this phase/workflow
+
+   **If status is `abandoned` or `cancelled`:**
+   - STOP and inform the user:
+     ```
+     Error: Workflow '$ARGUMENTS' has been cancelled.
+     
+     To restore this workflow:
+       1. Edit workflow/$ARGUMENTS/workflow-state.json
+       2. Change "status" to "in_progress"
+       3. Remove "cancelled_at" and "cancelled_reason" fields
+       4. Run /workflow-continue $ARGUMENTS
+     
+     Or start fresh: /workflow-start <new description>
+     ```
 
    **If status is `approved`:**
    - Move to the next phase

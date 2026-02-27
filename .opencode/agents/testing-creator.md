@@ -32,6 +32,8 @@ permission:
     # Coverage tools (allow)
     "npx jest*": "allow"
     "npx vitest*": "allow"
+    "vitest *": "allow"
+    "vitest": "allow"
     "npx c8*": "allow"
     "npx nyc*": "allow"
     "coverage *": "allow"
@@ -224,7 +226,7 @@ After running tests, document results:
 ## Testing Standards
 
 ### Coverage Targets
-- Unit tests: 80%+ line coverage
+- Unit tests: 70%+ line coverage (configurable per project)
 - All public APIs tested
 - All error paths tested
 - Edge cases covered

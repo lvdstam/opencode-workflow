@@ -29,9 +29,25 @@ This skill provides instructions for managing the gated development workflow sta
 
 - **Workflow root:** `workflow/<feature-slug>/`
 - **Feature description:** `workflow/<feature>/00-feature/description.md`
-- **Workflow state:** `workflow/<feature>/workflow-state.json`
-- **Phase status:** `workflow/<feature>/<phase>/status.json`
+- **Workflow state:** `workflow/<feature>/workflow-state.json` (PRIMARY source of truth)
+- **Phase status:** `workflow/<feature>/<phase>/status.json` (per-phase detail)
 - **Reviews:** `workflow/<feature>/<phase>/reviews/review-<N>.md`
+
+### Source of Truth Hierarchy
+
+1. **`workflow-state.json`** is the PRIMARY source of truth for:
+   - Overall workflow status (`in_progress`, `completed`, `escalated`, etc.)
+   - Current phase being worked on
+   - High-level phase status summaries
+   - Escalation history and PR URL
+
+2. **`<phase>/status.json`** provides DETAILED per-phase information:
+   - Iteration count and history
+   - Current reviewer feedback
+   - Detailed action history
+
+When reconciling conflicts, `workflow-state.json` takes precedence. The orchestrator 
+should keep both files in sync, but if they diverge, trust `workflow-state.json`.
 
 ## Workflow State Schema (`workflow-state.json`)
 
@@ -126,7 +142,8 @@ This skill provides instructions for managing the gated development workflow sta
 - `in_progress` - Actively being worked on
 - `completed` - All phases done, PR created
 - `escalated` - Waiting for human intervention
-- `abandoned` - Workflow cancelled
+- `abandoned` - Workflow cancelled (legacy, use `cancelled`)
+- `cancelled` - Workflow explicitly cancelled by user
 
 ### Phase Status
 - `pending` - Not yet started
@@ -142,7 +159,7 @@ pending → in_progress (when phase starts)
 in_progress → in_review (when creator completes artifact)
 in_review → in_progress (when reviewer requests revision)
 in_review → approved (when reviewer approves)
-in_review → escalated (when iterations >= max_iterations)
+in_review → escalated (when iterations >= max_iterations, i.e., after 4th iteration)
 escalated → in_progress (when human provides guidance)
 escalated → approved (when human overrides)
 ```
@@ -255,7 +272,7 @@ If state file is corrupted or invalid:
 A valid `workflow-state.json` must have:
 - `feature` (string, non-empty)
 - `current_phase` (string, valid phase name)
-- `status` (string, one of: in_progress, completed, escalated, abandoned)
+- `status` (string, one of: in_progress, completed, escalated, abandoned, cancelled)
 - `phases` (object with all 5 phases)
 
 A valid `status.json` must have:

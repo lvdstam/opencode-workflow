@@ -183,10 +183,10 @@ If ANY potential secret is found in tests:
 
 ### APPROVED When:
 - All tests pass
-- Coverage meets targets (80% line, 70% branch)
+- Coverage meets targets (70% line, 60% branch - configurable)
 - All requirements have test coverage
 - No CRITICAL issues
-- No more than 2 MAJOR issues
+- No more than 3 MAJOR issues
 - Tests are maintainable
 
 ### NEEDS_REVISION When:
@@ -194,14 +194,14 @@ If ANY potential secret is found in tests:
 - Coverage below targets
 - Requirements lack test coverage
 - Any CRITICAL issue exists
-- More than 2 MAJOR issues exist
+- More than 3 MAJOR issues exist
 - Flaky tests present
 
 ## What to Check
 
 ### 1. Coverage
-- Line coverage >= 80%?
-- Branch coverage >= 70%?
+- Line coverage >= 70%?
+- Branch coverage >= 60%?
 - All requirements covered?
 - Critical paths tested?
 

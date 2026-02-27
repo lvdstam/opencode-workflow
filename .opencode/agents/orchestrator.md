@@ -16,33 +16,7 @@ permission:
     "testing-reviewer": "allow"
     "docs-creator": "allow"
     "docs-reviewer": "allow"
-  bash:
-    # Git operations (allow)
-    "git status*": "allow"
-    "git branch*": "allow"
-    "git checkout*": "allow"
-    "git add*": "allow"
-    "git commit*": "allow"
-    "git log*": "allow"
-    "git diff*": "allow"
-    "git push*": "ask"
-    # GitHub CLI (ask)
-    "gh pr*": "ask"
-    "gh repo*": "ask"
-    # Directory creation (restricted to workflow/)
-    "mkdir -p workflow/*": "allow"
-    "mkdir workflow/*": "allow"
-    # Read operations (allow)
-    "ls *": "allow"
-    "cat *": "allow"
-    # Deny dangerous operations
-    "git reset*": "deny"
-    "git rebase*": "deny"
-    "git push --force*": "deny"
-    "git push -f*": "deny"
-    "rm *": "deny"
-    # Default deny
-    "*": "deny"
+  # Note: Bash permissions are centralized in opencode.json to avoid duplication
 ---
 
 # Workflow Orchestrator
@@ -148,11 +122,13 @@ Each phase has a `status.json`:
    - Feature description from `00-feature/description.md`
    - Previous phase artifacts (if not first phase)
    - Current reviewer feedback (if iteration > 1)
+   - After creator completes, update phase status to `in_progress` (artifact created)
 
 2. **Invoke Reviewer**: Call `@<phase>-reviewer` with:
    - The created artifact
    - Original feature description
    - Previous phase artifacts for context
+   - **Before invoking reviewer**: Update phase status to `in_review`
 
 3. **Process Review Result**:
    - If `APPROVED`: 
@@ -161,7 +137,7 @@ Each phase has a `status.json`:
      - Advance to next phase
    - If `NEEDS_REVISION`:
      - Increment iteration count
-     - If iterations >= 4: Escalate to human
+     - If iterations >= 4: Escalate to human (after 4th iteration without approval)
      - Otherwise: Return to step 1 with feedback
 
 ### Escalation Protocol
@@ -183,9 +159,52 @@ When escalating (iterations >= 4 without approval):
 When all phases complete:
 1. Ensure all changes are committed
 2. Push branch to remote: `git push -u origin <branch>`
-3. Create PR using: `gh pr create --title "<title>" --body "<body>"`
+3. Create PR using the template below
 4. Update `pr_url` in workflow-state.json
 5. Inform human that PR is ready for review
+
+### PR Body Template
+
+Use this format when creating the pull request:
+
+```bash
+gh pr create --title "[Feature] <feature-title>" --body "$(cat <<'EOF'
+## Summary
+
+<Brief description of the feature>
+
+## Changes
+
+### Requirements
+- <Key requirements implemented>
+
+### Architecture
+- <Key architectural decisions>
+
+### Implementation
+- <Main code changes>
+
+### Testing
+- <Test coverage summary>
+
+### Documentation
+- <Documentation added/updated>
+
+## Workflow Artifacts
+
+All workflow artifacts are in `workflow/<feature-slug>/`:
+- Requirements: `01-requirements/requirements.md`
+- Architecture: `02-architecture/architecture.md`
+- Implementation: `03-implementation/changes.md`
+- Testing: `04-testing/coverage-report.md`
+- Documentation: `05-documentation/user-docs.md`
+
+## Review Notes
+
+<Any special considerations for reviewers>
+EOF
+)"
+```
 
 ## Git Protocol
 
