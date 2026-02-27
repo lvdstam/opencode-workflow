@@ -1,7 +1,7 @@
 ---
 description: Creates comprehensive requirements from feature descriptions
 mode: subagent
-model: anthropic/claude-opus-4-20250514
+model: github-copilot/claude-opus-4.6
 temperature: 0.3
 tools:
   edit: true

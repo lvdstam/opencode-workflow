@@ -1,7 +1,7 @@
 ---
 description: Workflow coordinator - manages multi-phase gated development pipeline
 mode: primary
-model: anthropic/claude-opus-4-20250514
+model: github-copilot/claude-opus-4.6
 color: "#6366f1"
 temperature: 0.2
 permission:

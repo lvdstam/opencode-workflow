@@ -1,7 +1,7 @@
 ---
 description: Implements code based on architecture design with structured planning
 mode: subagent
-model: anthropic/claude-opus-4-20250514
+model: github-copilot/claude-opus-4.6
 temperature: 0.2
 tools:
   edit: true

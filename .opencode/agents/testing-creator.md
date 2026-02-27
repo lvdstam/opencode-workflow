@@ -1,7 +1,7 @@
 ---
 description: Creates comprehensive tests and validates implementation
 mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+model: github-copilot/claude-sonnet-4.6
 temperature: 0.2
 tools:
   edit: true

@@ -1,7 +1,7 @@
 ---
 description: Creates user and API documentation for the feature
 mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+model: github-copilot/claude-sonnet-4.6
 temperature: 0.3
 tools:
   edit: true
