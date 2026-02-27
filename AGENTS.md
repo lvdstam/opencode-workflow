@@ -49,6 +49,7 @@ Or list all workflows:
 ```
 /workflow-approve <feature-slug>   # Force approve current phase
 /workflow-reset <feature-slug>     # Reset current phase
+/workflow-cancel <feature-slug>    # Cancel and abandon workflow
 ```
 
 ## Directory Structure
@@ -149,3 +150,35 @@ If the same phase keeps escalating, review the creator/reviewer feedback to iden
 
 ### Git Conflicts
 Resolve conflicts manually, then `/workflow-continue` to resume.
+
+### Corrupted State Files
+If `workflow-state.json` or `status.json` is corrupted:
+1. The orchestrator will attempt to reconstruct state from artifacts and git history
+2. If reconstruction fails, use `/workflow-reset <slug> all` to restart
+3. Or manually edit the JSON files to fix issues
+
+### Input Validation Errors
+All commands validate inputs before execution:
+- Slugs must be lowercase alphanumeric with hyphens only
+- Slugs cannot contain path traversal characters (`..`, `/`, `\`)
+- Maximum slug length is 50 characters
+- Phase names must be valid (e.g., `01-requirements`)
+
+### Command Not Found
+Ensure you're using the correct command syntax:
+```
+/workflow-start <description>      # Start new workflow
+/workflow-continue <slug>          # Resume workflow
+/workflow-status <slug>            # Check status
+/workflow-list                     # List all workflows
+/workflow-approve <slug>           # Force approve
+/workflow-reset <slug> [phase]     # Reset phase(s)
+/workflow-cancel <slug>            # Cancel workflow
+```
+
+### Restoring Cancelled Workflows
+To restore a cancelled workflow:
+1. Edit `workflow/<slug>/workflow-state.json`
+2. Change `"status": "abandoned"` to `"status": "in_progress"`
+3. Remove `cancelled_at` and `cancelled_reason` fields
+4. Run `/workflow-continue <slug>`

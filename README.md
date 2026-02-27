@@ -12,24 +12,38 @@ A structured, multi-phase development workflow with gated reviews using OpenCode
 
 ## Quick Start
 
+### Prerequisites
+- **OpenCode**: v0.1.0 or later
+- **Git**: For version control
+- **GitHub CLI** (`gh`): For creating pull requests
+- **Model Provider**: Anthropic, OpenAI, or other supported provider configured in OpenCode
+
+### Installation
+
 1. **Install OpenCode** (if not already installed):
    ```bash
    curl -fsSL https://opencode.ai/install | bash
    ```
 
-2. **Configure your model provider** in OpenCode
+2. **Clone this repository**:
+   ```bash
+   git clone https://github.com/lvdstam/opencode-workflow.git
+   cd opencode-workflow
+   ```
 
-3. **Start a workflow**:
+3. **Configure your model provider** in OpenCode (see OpenCode docs)
+
+4. **Start a workflow**:
    ```
    /workflow-start Add user authentication with email/password and OAuth
    ```
 
-4. **Monitor progress**:
+5. **Monitor progress**:
    ```
    /workflow-status <feature-slug>
    ```
 
-5. **Continue after interruption**:
+6. **Continue after interruption**:
    ```
    /workflow-continue <feature-slug>
    ```
@@ -43,7 +57,8 @@ A structured, multi-phase development workflow with gated reviews using OpenCode
 | `/workflow-status <slug>` | Show workflow status |
 | `/workflow-list` | List all workflows |
 | `/workflow-approve <slug>` | Force approve current phase |
-| `/workflow-reset <slug>` | Reset current phase |
+| `/workflow-reset <slug> [phase]` | Reset current or specific phase |
+| `/workflow-cancel <slug>` | Cancel and abandon workflow |
 
 ## Architecture
 
@@ -54,7 +69,7 @@ A structured, multi-phase development workflow with gated reviews using OpenCode
 │   ├── orchestrator.md     # Primary workflow coordinator
 │   ├── *-creator.md        # Phase creators (5)
 │   └── *-reviewer.md       # Phase reviewers (5)
-├── commands/               # 6 workflow commands
+├── commands/               # 7 workflow commands
 └── skills/
     └── workflow-state/     # State management instructions
 
@@ -109,6 +124,20 @@ See [AGENTS.md](./AGENTS.md) for detailed workflow documentation.
 - **Adjust iteration limits**: Change `max_iterations` in agent prompts
 - **Add new phases**: Create new creator/reviewer agent pairs
 - **Change models**: Update `.opencode/opencode.json`
+
+## Troubleshooting
+
+Common issues and solutions:
+
+| Issue | Solution |
+|-------|----------|
+| Workflow stuck | Run `/workflow-continue <slug>` or `/workflow-reset <slug>` |
+| Escalation loop | Use `/workflow-approve <slug>` to override |
+| Git conflicts | Resolve manually, then `/workflow-continue <slug>` |
+| Corrupted state | Orchestrator auto-recovers, or `/workflow-reset <slug> all` |
+| Invalid slug | Use only lowercase letters, numbers, and hyphens |
+
+See [AGENTS.md](./AGENTS.md) for detailed troubleshooting.
 
 ## License
 
