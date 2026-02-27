@@ -13,15 +13,31 @@ tools:
   task: false
 permission:
   bash:
-    "npm test *": "allow"
+    # Test execution (allow)
+    "npm test*": "allow"
     "npm run test*": "allow"
     "npm run coverage*": "allow"
     "yarn test*": "allow"
+    "yarn coverage*": "allow"
     "pnpm test*": "allow"
-    "pytest *": "allow"
-    "go test *": "allow"
-    "cargo test *": "allow"
+    "pnpm coverage*": "allow"
+    "pytest*": "allow"
+    "python -m pytest*": "allow"
+    "go test*": "allow"
+    "cargo test*": "allow"
     "make test*": "allow"
+    "make coverage*": "allow"
+    # Coverage reporting (allow)
+    "npx jest --coverage*": "allow"
+    "npx c8*": "allow"
+    "coverage report*": "allow"
+    # Read-only inspection (allow)
+    "ls *": "allow"
+    "cat *": "allow"
+    "head *": "allow"
+    "tail *": "allow"
+    "wc *": "allow"
+    # Default deny
     "*": "deny"
 ---
 

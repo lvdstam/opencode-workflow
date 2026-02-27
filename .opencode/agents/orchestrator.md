@@ -17,9 +17,32 @@ permission:
     "docs-creator": "allow"
     "docs-reviewer": "allow"
   bash:
-    "git *": "allow"
-    "gh *": "ask"
-    "mkdir *": "allow"
+    # Git operations (allow)
+    "git status*": "allow"
+    "git branch*": "allow"
+    "git checkout*": "allow"
+    "git add*": "allow"
+    "git commit*": "allow"
+    "git log*": "allow"
+    "git diff*": "allow"
+    "git push*": "ask"
+    # GitHub CLI (ask)
+    "gh pr*": "ask"
+    "gh repo*": "ask"
+    # Directory creation (restricted to workflow/)
+    "mkdir -p workflow/*": "allow"
+    "mkdir workflow/*": "allow"
+    # Read operations (allow)
+    "ls *": "allow"
+    "cat *": "allow"
+    # Deny dangerous operations
+    "git reset*": "deny"
+    "git rebase*": "deny"
+    "git push --force*": "deny"
+    "git push -f*": "deny"
+    "rm *": "deny"
+    # Default deny
+    "*": "deny"
 ---
 
 # Workflow Orchestrator

@@ -13,15 +13,24 @@ tools:
   task: false
 permission:
   bash:
-    "npm test *": "allow"
+    # Test execution (allow)
+    "npm test*": "allow"
     "npm run test*": "allow"
     "npm run lint*": "allow"
     "yarn test*": "allow"
     "pnpm test*": "allow"
-    "pytest *": "allow"
-    "go test *": "allow"
-    "cargo test *": "allow"
+    "pytest*": "allow"
+    "python -m pytest*": "allow"
+    "go test*": "allow"
+    "cargo test*": "allow"
     "make test*": "allow"
+    # Read-only inspection (allow)
+    "ls *": "allow"
+    "cat *": "allow"
+    "head *": "allow"
+    "tail *": "allow"
+    "wc *": "allow"
+    # Default deny
     "*": "deny"
 ---
 

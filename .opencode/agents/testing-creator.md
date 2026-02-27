@@ -13,17 +13,38 @@ tools:
   task: false
 permission:
   bash:
-    "npm *": "allow"
-    "npx *": "allow"
-    "yarn *": "allow"
-    "pnpm *": "allow"
-    "bun *": "allow"
-    "pytest *": "allow"
-    "python *": "allow"
-    "go test *": "allow"
-    "cargo test *": "allow"
-    "make *": "allow"
+    # Test execution (allow)
+    "npm test*": "allow"
+    "npm run test*": "allow"
+    "npm run coverage*": "allow"
+    "yarn test*": "allow"
+    "yarn coverage*": "allow"
+    "pnpm test*": "allow"
+    "pnpm coverage*": "allow"
+    "bun test*": "allow"
+    "pytest*": "allow"
+    "python -m pytest*": "allow"
+    "python -m unittest*": "allow"
+    "go test*": "allow"
+    "cargo test*": "allow"
+    "make test*": "allow"
+    "make coverage*": "allow"
+    # Coverage tools (allow)
+    "npx jest*": "allow"
+    "npx vitest*": "allow"
+    "npx c8*": "allow"
+    "npx nyc*": "allow"
+    "coverage *": "allow"
+    # Lint (allow - for pre-test checks)
+    "npm run lint*": "allow"
+    # Package installation for test deps (ask)
+    "npm install*": "ask"
+    "pip install*": "ask"
+    # Deny dangerous commands
+    "rm *": "deny"
     "git *": "deny"
+    # Default deny
+    "*": "deny"
 ---
 
 # Testing Creator

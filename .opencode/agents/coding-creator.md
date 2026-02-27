@@ -13,18 +13,54 @@ tools:
   task: false
 permission:
   bash:
-    "npm *": "allow"
-    "npx *": "allow"
-    "yarn *": "allow"
-    "pnpm *": "allow"
-    "bun *": "allow"
-    "go *": "allow"
-    "cargo *": "allow"
-    "pip *": "allow"
-    "python *": "allow"
-    "pytest *": "allow"
-    "make *": "allow"
+    # Package installation (ask for approval)
+    "npm install*": "ask"
+    "npm ci*": "ask"
+    "yarn install*": "ask"
+    "yarn add*": "ask"
+    "pnpm install*": "ask"
+    "pnpm add*": "ask"
+    "bun install*": "ask"
+    "bun add*": "ask"
+    "pip install*": "ask"
+    "cargo add*": "ask"
+    "go get*": "ask"
+    # Build commands (allow)
+    "npm run build*": "allow"
+    "npm run dev*": "allow"
+    "npm run start*": "allow"
+    "yarn build*": "allow"
+    "yarn dev*": "allow"
+    "pnpm build*": "allow"
+    "pnpm dev*": "allow"
+    "bun run build*": "allow"
+    "bun run dev*": "allow"
+    "go build*": "allow"
+    "cargo build*": "allow"
+    "make build*": "allow"
+    "make dev*": "allow"
+    # Lint/format (allow)
+    "npm run lint*": "allow"
+    "npm run format*": "allow"
+    "npx prettier*": "allow"
+    "npx eslint*": "allow"
+    # Type checking (allow)
+    "npm run typecheck*": "allow"
+    "npx tsc*": "allow"
+    # Test commands (allow)
+    "npm test*": "allow"
+    "npm run test*": "allow"
+    "pytest*": "allow"
+    "go test*": "allow"
+    "cargo test*": "allow"
+    # Deny dangerous commands
+    "npm publish*": "deny"
+    "npm unpublish*": "deny"
+    "pip uninstall*": "deny"
+    "rm *": "deny"
     "git *": "deny"
+    # Default deny
+    "*": "deny"
 ---
 
 # Coding Creator
