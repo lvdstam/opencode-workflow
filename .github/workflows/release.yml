@@ -21,10 +21,14 @@ jobs:
 
       - name: Create zip files
         run: |
+          # Create version file
+          echo "${{ steps.version.outputs.VERSION }}" > .opencode-workflow-version
+
           # Create versioned zip
           zip -r workflow-${{ steps.version.outputs.VERSION }}.zip \
             .opencode/ \
             .tools/ \
+            .opencode-workflow-version \
             AGENTS.md \
             README.md
 
