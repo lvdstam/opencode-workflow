@@ -13,50 +13,18 @@ tools:
   task: false
 permission:
   bash:
-    # Package installation (ask for approval)
-    "npm install*": "ask"
-    "npm ci*": "ask"
-    "yarn install*": "ask"
-    "yarn add*": "ask"
-    "pnpm install*": "ask"
-    "pnpm add*": "ask"
-    "bun install*": "ask"
-    "bun add*": "ask"
-    "pip install*": "ask"
-    "cargo add*": "ask"
-    "go get*": "ask"
-    # Build commands (allow)
-    "npm run build*": "allow"
-    "npm run dev*": "allow"
-    "npm run start*": "allow"
-    "yarn build*": "allow"
-    "yarn dev*": "allow"
-    "pnpm build*": "allow"
-    "pnpm dev*": "allow"
-    "bun run build*": "allow"
-    "bun run dev*": "allow"
-    "go build*": "allow"
-    "cargo build*": "allow"
-    "make build*": "allow"
-    "make dev*": "allow"
-    # Lint/format (allow)
-    "npm run lint*": "allow"
-    "npm run format*": "allow"
-    "npx prettier*": "allow"
-    "npx eslint*": "allow"
-    # Type checking (allow)
-    "npm run typecheck*": "allow"
-    "npx tsc*": "allow"
-    # Test commands (allow)
-    "npm test*": "allow"
-    "npm run test*": "allow"
-    "pytest*": "allow"
-    "go test*": "allow"
-    "cargo test*": "allow"
+    # Tool wrapper scripts (technology-agnostic)
+    ".tools/bin/test.sh*": "allow"
+    ".tools/bin/build.sh*": "allow"
+    ".tools/bin/lint.sh*": "allow"
+    ".tools/bin/format.sh*": "allow"
+    ".tools/bin/typecheck.sh*": "allow"
+    ".tools/bin/dev.sh*": "allow"
+    ".tools/bin/install.sh*": "ask"
+    # Read operations (allow)
+    "ls *": "allow"
+    "cat *": "allow"
     # Deny dangerous commands
-    "npm publish*": "deny"
-    "npm unpublish*": "deny"
-    "pip uninstall*": "deny"
     "rm *": "deny"
     "git *": "deny"
     # Default deny
@@ -257,11 +225,28 @@ When you receive feedback:
 4. Don't break existing functionality
 5. Run tests after changes if available
 
+## Using Tool Scripts
+
+This project uses technology-agnostic wrapper scripts in `.tools/bin/`. Always use these instead of direct tool commands:
+
+| Script | Purpose | Example |
+|--------|---------|---------|
+| `.tools/bin/test.sh` | Run tests | `.tools/bin/test.sh` |
+| `.tools/bin/build.sh` | Build/compile | `.tools/bin/build.sh` |
+| `.tools/bin/lint.sh` | Run linter | `.tools/bin/lint.sh` |
+| `.tools/bin/format.sh` | Auto-format code | `.tools/bin/format.sh` |
+| `.tools/bin/typecheck.sh` | Type checking | `.tools/bin/typecheck.sh` |
+| `.tools/bin/dev.sh` | Start dev server | `.tools/bin/dev.sh` |
+| `.tools/bin/install.sh` | Install dependencies | `.tools/bin/install.sh` (requires confirmation) |
+
+**Note**: If a script outputs "ERROR: ... not configured", the project has not configured that tool yet. Inform the user they need to configure it in `.tools/bin/`.
+
 ## Important Rules
 
 1. **Plan First**: Always create/update plan.md before coding
 2. **Document Changes**: Keep changes.md up to date
 3. **Follow Architecture**: Don't deviate from the approved design
 4. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
-5. **Test Locally**: Run available tests to verify your changes
+5. **Test Locally**: Run `.tools/bin/test.sh` to verify your changes
 6. **Incremental Progress**: Build in logical steps, verify each step works
+7. **Use Tool Scripts**: Always use `.tools/bin/` scripts instead of direct tool commands (npm, pytest, cargo, etc.)

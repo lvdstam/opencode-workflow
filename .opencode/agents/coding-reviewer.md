@@ -13,17 +13,11 @@ tools:
   task: false
 permission:
   bash:
-    # Test execution (allow)
-    "npm test*": "allow"
-    "npm run test*": "allow"
-    "npm run lint*": "allow"
-    "yarn test*": "allow"
-    "pnpm test*": "allow"
-    "pytest*": "allow"
-    "python -m pytest*": "allow"
-    "go test*": "allow"
-    "cargo test*": "allow"
-    "make test*": "allow"
+    # Tool wrapper scripts (technology-agnostic)
+    ".tools/bin/test.sh*": "allow"
+    ".tools/bin/lint.sh*": "allow"
+    ".tools/bin/typecheck.sh*": "allow"
+    ".tools/bin/coverage.sh*": "allow"
     # Read-only inspection (allow)
     "ls *": "allow"
     "cat *": "allow"
@@ -226,12 +220,26 @@ If ANY potential secret is found:
 
 Apply the same rigor to every iteration. The goal is production-quality code.
 
+## Using Tool Scripts
+
+This project uses technology-agnostic wrapper scripts in `.tools/bin/`. Always use these instead of direct tool commands:
+
+| Script | Purpose |
+|--------|---------|
+| `.tools/bin/test.sh` | Run tests |
+| `.tools/bin/lint.sh` | Run linter |
+| `.tools/bin/typecheck.sh` | Type checking |
+| `.tools/bin/coverage.sh` | Coverage report |
+
+**Note**: If a script outputs "ERROR: ... not configured", the project has not configured that tool yet.
+
 ## Important Rules
 
-1. **Run tests**: Always run available tests
+1. **Run tests**: Always run `.tools/bin/test.sh` to verify tests pass
 2. **Read the code**: Don't just read summaries, read actual code
 3. **Check edge cases**: Look for unhandled scenarios
 4. **Security first**: Never approve code with security issues
 5. **Be specific**: Point to exact files and lines
 6. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
 7. **Review Only**: Create review files, do NOT modify the code being reviewed
+8. **Use Tool Scripts**: Always use `.tools/bin/` scripts instead of direct tool commands

@@ -23,10 +23,14 @@
       "ls *": "allow",
       "cat *": "allow",
       "mkdir *": "allow",
-      "npm test *": "ask",
-      "npm run *": "ask",
-      "pytest *": "ask",
-      "go test *": "ask"
+      ".tools/bin/test.sh*": "allow",
+      ".tools/bin/build.sh*": "allow",
+      ".tools/bin/lint.sh*": "allow",
+      ".tools/bin/format.sh*": "allow",
+      ".tools/bin/coverage.sh*": "allow",
+      ".tools/bin/typecheck.sh*": "allow",
+      ".tools/bin/dev.sh*": "allow",
+      ".tools/bin/install.sh*": "ask"
     },
     "edit": "allow",
     "write": "allow",

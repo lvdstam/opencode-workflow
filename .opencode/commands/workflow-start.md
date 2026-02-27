@@ -10,7 +10,72 @@ Initialize a new gated development workflow for the following feature:
 **Feature Description:**
 $ARGUMENTS
 
-## Input Validation (REQUIRED FIRST STEP)
+## Tool Configuration Check (REQUIRED FIRST STEP)
+
+Before starting the workflow, verify that project tools are configured:
+
+1. **Check for `.tools/bin/` directory**
+   - If missing, STOP and inform user:
+     ```
+     Error: .tools/bin/ directory not found.
+     
+     This workflow system requires tool wrapper scripts to be configured.
+     
+     To initialize:
+       /workflow-init
+     
+     Or manually create .tools/bin/ with these scripts:
+       test.sh, build.sh, lint.sh, format.sh, 
+       coverage.sh, install.sh, typecheck.sh, dev.sh
+     
+     See .tools/README.md for configuration examples.
+     ```
+
+2. **Check each script for configuration status**
+   For each script in `.tools/bin/`:
+   - Read the script content
+   - If it contains `echo "ERROR:.*not configured` → mark as "unconfigured"
+   - If that pattern is NOT found → mark as "configured"
+   - If script is missing → mark as "missing"
+
+3. **Display configuration summary**
+   ```
+   Tool Configuration Status
+   =========================
+   
+   [✓] test.sh      - Configured
+   [✗] build.sh     - Not configured
+   [✓] lint.sh      - Configured
+   [✗] format.sh    - Not configured
+   [✗] coverage.sh  - Not configured
+   [✓] install.sh   - Configured
+   [✗] typecheck.sh - Not configured
+   [!] dev.sh       - Missing
+   
+   Configured: 3/8 | Unconfigured: 4/8 | Missing: 1/8
+   ```
+
+4. **Warn and ask for confirmation if any scripts are unconfigured**
+   ```
+   Warning: Some tool scripts are not configured.
+   
+   The following phases may be affected:
+   - 03-implementation: needs build.sh, lint.sh, format.sh, typecheck.sh
+   - 04-testing: needs test.sh, coverage.sh
+   
+   Recommendations:
+   - Configure at least: test.sh, build.sh, lint.sh
+   - Edit scripts in .tools/bin/ and uncomment your tool commands
+   - See .tools/README.md for configuration examples
+   
+   Proceed anyway? [y/n]
+   (The workflow can be paused later to configure tools)
+   ```
+   
+   Wait for user confirmation before proceeding.
+   If user declines, STOP with message about how to configure tools.
+
+## Input Validation (REQUIRED SECOND STEP)
 
 Before proceeding, validate all inputs:
 
