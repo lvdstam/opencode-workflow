@@ -24,13 +24,16 @@ jobs:
           # Create version file
           echo "${{ steps.version.outputs.VERSION }}" > .opencode-workflow-version
 
+          # Rename README.md to avoid conflicts with user's README
+          cp README.md WORKFLOW-README.md
+
           # Create versioned zip
           zip -r workflow-${{ steps.version.outputs.VERSION }}.zip \
             .opencode/ \
             .tools/ \
             .opencode-workflow-version \
             AGENTS.md \
-            README.md
+            WORKFLOW-README.md
 
           # Create latest zip (same content, stable filename)
           cp workflow-${{ steps.version.outputs.VERSION }}.zip workflow-latest.zip
