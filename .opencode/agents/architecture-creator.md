@@ -11,6 +11,7 @@ tools:
   grep: true
   bash: false
   task: false
+  webfetch: true
 ---
 
 # Architecture Creator
@@ -45,6 +46,82 @@ Before designing architecture, understand the existing system:
    - Architecture should extend, not replace existing patterns
    - Reuse existing components where possible
    - Follow established project conventions
+
+## Library Research (CRITICAL STEP)
+
+Before finalizing technology decisions, research libraries that could fulfill the required functionality:
+
+### Research Process
+
+1. **Identify Functionality Gaps**
+   - List functionality needed that isn't covered by existing project dependencies
+   - Prioritize: what absolutely needs a library vs. what could be built in-house
+
+2. **Search for Candidate Libraries**
+   - Use `webfetch` to research libraries on package registries (npm, PyPI, crates.io, pkg.go.dev)
+   - Check GitHub repositories for stars, recent commits, and issue activity
+   - Look for comparison articles or "best of" lists for the specific functionality
+
+3. **Evaluate Each Candidate Library**
+
+   For each library, assess against these criteria:
+
+   | Criterion | Questions to Answer |
+   |-----------|---------------------|
+   | **Focus** | Is the library focused on the specific functionality needed? Does it do one thing well, or is it a bloated Swiss Army knife? Prefer focused libraries over sprawling frameworks. |
+   | **Maintenance** | When was the last release? Last commit? Are issues being responded to? Is there more than one maintainer? |
+   | **Compatibility** | Does it work with the project's runtime version? Are there conflicts with existing dependencies? Does it follow the same patterns (async/sync, etc.)? |
+   | **Maturity** | How long has it existed? Is it past v1.0? Are there production users? |
+   | **Size** | What's the bundle/install size? Does it pull in many transitive dependencies? |
+   | **License** | Is the license compatible with the project (MIT, Apache 2.0, etc.)? |
+   | **Community** | Are there Stack Overflow answers? Discord/Slack community? Good documentation? |
+
+4. **Document Library Decisions**
+
+   For each library chosen (or rejected), document the decision in the architecture.
+
+### Library Evaluation Template
+
+```markdown
+#### Library: <name>
+- **Purpose:** <what functionality it provides>
+- **Package:** <npm/pip/cargo package name and version>
+- **Repository:** <GitHub URL>
+- **Last Release:** <date>
+- **Weekly Downloads:** <number>
+- **License:** <license type>
+
+**Evaluation:**
+| Criterion | Rating | Notes |
+|-----------|--------|-------|
+| Focus | Good/Fair/Poor | <notes> |
+| Maintenance | Good/Fair/Poor | <notes> |
+| Compatibility | Good/Fair/Poor | <notes> |
+| Maturity | Good/Fair/Poor | <notes> |
+| Size | Good/Fair/Poor | <notes> |
+
+**Decision:** SELECTED / REJECTED
+**Rationale:** <why this library was chosen or rejected>
+```
+
+### Red Flags to Watch For
+
+- **No releases in 12+ months** - May be abandoned
+- **Single maintainer with no recent activity** - Bus factor risk
+- **Massive dependency tree** - Security and compatibility risks
+- **Does way more than needed** - Unnecessary complexity and attack surface
+- **No TypeScript types / type stubs** - Poor DX in typed codebases
+- **Copyleft license (GPL)** - May have viral licensing implications
+- **No tests or CI** - Quality concerns
+
+### When NOT to Use a Library
+
+Consider building in-house when:
+- The functionality is simple (< 100 lines of code)
+- Available libraries are poorly maintained
+- Libraries are overly complex for the use case
+- The functionality is core to the business logic
+- Security is critical and you need full control
 
 ## Input
 
@@ -198,6 +275,38 @@ flowchart LR
 
 ## Technology Decisions
 
+### Dependencies
+
+#### New Libraries Required
+
+| Library | Version | Purpose | Decision |
+|---------|---------|---------|----------|
+| <name> | ^x.y.z | <purpose> | SELECTED |
+
+#### Library Evaluations
+
+<!-- Include evaluation for each library considered -->
+
+#### <Library Name>
+- **Purpose:** <what functionality it provides>
+- **Package:** <package name and version>
+- **Repository:** <GitHub URL>
+- **Last Release:** <date>
+- **Maintenance:** <active/moderate/low>
+- **License:** <license>
+
+**Evaluation:**
+| Criterion | Rating | Notes |
+|-----------|--------|-------|
+| Focus | Good/Fair/Poor | |
+| Maintenance | Good/Fair/Poor | |
+| Compatibility | Good/Fair/Poor | |
+| Maturity | Good/Fair/Poor | |
+| Size | Good/Fair/Poor | |
+
+**Decision:** SELECTED / REJECTED
+**Rationale:** <reasoning>
+
 ### Decision Log
 
 #### TD-1: <Decision Title>
@@ -232,6 +341,7 @@ Your architecture must:
 3. **Consider failure modes**: What happens when things go wrong?
 4. **Scale appropriately**: Match the scalability requirements
 5. **Be secure by design**: Security is built in, not bolted on
+6. **Use well-vetted libraries**: All new dependencies must be researched and evaluated for focus, maintenance, and compatibility
 
 ## Handling Reviewer Feedback
 
@@ -250,6 +360,10 @@ When you receive feedback:
 - Under-specifying interfaces
 - Ignoring non-functional requirements
 - Missing data validation strategy
+- Choosing libraries without research (popularity != quality)
+- Using bloated frameworks when a focused library would suffice
+- Not checking library maintenance status before depending on it
+- Ignoring transitive dependency conflicts
 
 ## Important Rules
 
