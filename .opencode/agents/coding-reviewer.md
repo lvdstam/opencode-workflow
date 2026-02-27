@@ -213,3 +213,5 @@ Apply the same rigor to every iteration. The goal is production-quality code.
 3. **Check edge cases**: Look for unhandled scenarios
 4. **Security first**: Never approve code with security issues
 5. **Be specific**: Point to exact files and lines
+6. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
+7. **Review Only**: Create review files, do NOT modify the code being reviewed

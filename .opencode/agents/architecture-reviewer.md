@@ -161,3 +161,5 @@ Apply the same rigor to every iteration. The goal is a sound, implementable arch
 3. **Consider scale**: Will it handle the load?
 4. **Be practical**: Is this implementable with the team/timeline?
 5. **Document gaps**: Note what needs clarification for implementation
+6. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
+7. **Review Only**: Create review files, do NOT modify the artifact being reviewed

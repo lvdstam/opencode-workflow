@@ -236,3 +236,4 @@ When you receive feedback:
 3. **No skipped tests**: All tests should run
 4. **Meaningful assertions**: Test actual behavior, not implementation
 5. **Trace to requirements**: Every requirement should have test coverage
+6. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands

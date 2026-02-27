@@ -236,6 +236,6 @@ When you receive feedback:
 1. **Plan First**: Always create/update plan.md before coding
 2. **Document Changes**: Keep changes.md up to date
 3. **Follow Architecture**: Don't deviate from the approved design
-4. **No Git Operations**: Leave git to the orchestrator
+4. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
 5. **Test Locally**: Run available tests to verify your changes
-6. **Incremental Progress**: Commit logical chunks, not everything at once
+6. **Incremental Progress**: Build in logical steps, verify each step works

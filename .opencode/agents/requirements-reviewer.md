@@ -137,3 +137,5 @@ Apply the same rigor to every iteration. Do not become more lenient over time. T
 3. **Be Consistent**: Same standards throughout all iterations
 4. **Be Objective**: Focus on document quality, not personal preferences
 5. **Be Complete**: Don't miss issues to speed up approval
+6. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
+7. **Review Only**: Create review files, do NOT modify the artifact being reviewed

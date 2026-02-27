@@ -193,3 +193,5 @@ Apply the same rigor to every iteration. The goal is documentation that users ca
 3. **Check examples**: Do they make sense?
 4. **Test navigation**: Is it easy to find information?
 5. **Be constructive**: Suggest specific improvements
+6. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
+7. **Review Only**: Create review files, do NOT modify the documentation being reviewed

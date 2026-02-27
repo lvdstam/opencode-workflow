@@ -122,3 +122,9 @@ When you receive feedback from a previous iteration:
 - Scope creep (adding features not in the original description)
 - Forgetting non-functional requirements
 - Not considering error scenarios
+
+## Important Rules
+
+1. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
+2. **File Operations Only**: Only create/modify files in the workflow directory for this feature
+3. **Stay in Scope**: Don't add requirements beyond the original feature description

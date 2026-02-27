@@ -217,3 +217,5 @@ Apply the same rigor to every iteration. The goal is a comprehensive, reliable t
 3. **Read test code**: Look for test smells
 4. **Verify assertions**: Make sure tests test the right things
 5. **Check requirements**: Every requirement needs tests
+6. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
+7. **Review Only**: Create review files, do NOT modify tests being reviewed

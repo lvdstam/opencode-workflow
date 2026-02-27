@@ -272,3 +272,4 @@ When you receive feedback:
 3. **Accuracy matters**: Test all code examples
 4. **Keep it current**: Match actual implementation
 5. **Accessibility**: Use clear headings and structure
+6. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands

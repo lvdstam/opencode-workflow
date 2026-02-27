@@ -221,3 +221,9 @@ When you receive feedback:
 - Under-specifying interfaces
 - Ignoring non-functional requirements
 - Missing data validation strategy
+
+## Important Rules
+
+1. **No Git Operations**: Leave git to the orchestrator - you must NOT run any git commands
+2. **File Operations Only**: Only create/modify files in the workflow directory for this feature
+3. **Trace to Requirements**: Every requirement must have architectural coverage
