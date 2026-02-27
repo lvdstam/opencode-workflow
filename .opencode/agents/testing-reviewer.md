@@ -158,6 +158,22 @@ Create a review file at `workflow/<feature>/04-testing/reviews/review-<N>.md`:
 - [ ] No sleeps or timing-dependent tests
 - [ ] No tests that pass when code is broken
 - [ ] No overly complex test setup
+- [ ] No hardcoded secrets in test files (use test fixtures or mocks)
+
+## Secret Scanning in Tests
+
+**CRITICAL: Scan test files for secrets before approval**
+
+Tests often accidentally contain:
+- Real API keys copied for "quick testing"
+- Database credentials from local development
+- Bearer tokens from manual testing
+- Connection strings to real services
+
+If ANY potential secret is found in tests:
+1. Mark as **CRITICAL** issue
+2. Recommend using mock values or environment variables
+3. Suggest test fixtures for sensitive configuration
 
 ## Recommendations
 - <Testing improvements>

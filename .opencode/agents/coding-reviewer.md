@@ -144,6 +144,26 @@ Create a review file at `workflow/<feature>/03-implementation/reviews/review-<N>
 - [ ] Authorization checked where needed
 - [ ] Sensitive data handled properly
 
+## Secret Scanning
+
+**CRITICAL: Scan all code for secrets before approval**
+
+Look for patterns indicating secrets:
+- API keys: `api_key`, `apiKey`, `API_KEY`, strings starting with `sk-`, `pk_`, etc.
+- Passwords: `password`, `passwd`, `pwd`, `secret`
+- Tokens: `token`, `auth_token`, `access_token`, `bearer`
+- Credentials: `credential`, `cred`, `username` + password nearby
+- Connection strings: `mongodb://`, `postgres://`, `mysql://`, `redis://`
+- AWS: `AKIA`, `aws_access_key`, `aws_secret`
+- Private keys: `-----BEGIN`, `-----BEGIN RSA PRIVATE KEY-----`
+- Environment patterns: hardcoded values that should be in env vars
+
+If ANY potential secret is found:
+1. Mark as **CRITICAL** issue
+2. Identify exact file and line
+3. Do NOT include the actual secret value in the review
+4. Recommend using environment variables or secret management
+
 ## Performance Checklist
 
 - [ ] No obvious N+1 queries

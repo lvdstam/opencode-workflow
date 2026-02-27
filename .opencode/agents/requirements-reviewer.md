@@ -70,6 +70,7 @@ Create a review file at `workflow/<feature>/01-requirements/reviews/review-<N>.m
 
 ### Minor (Nice to fix, won't block approval)
 1. **[MINOR]** <Issue description>
+   - Location: <Where in document>
    - Suggestion: <How to fix>
 
 ## Recommendations
