@@ -40,8 +40,28 @@ Before proceeding, validate all inputs:
 1. **Load Current State**
    Read `workflow/$ARGUMENTS/workflow-state.json`
 
-2. **Confirm Current Phase**
-   Tell the human which phase will be approved and its current iteration count
+2. **Display Confirmation Prompt**
+   Before approving, show the human:
+   ```
+   ═══════════════════════════════════════════════════════════════
+   CONFIRM APPROVAL
+   ═══════════════════════════════════════════════════════════════
+   
+   Feature:    <slug>
+   Phase:      <current phase>
+   Iterations: <N> of 4
+   Status:     <current status>
+   
+   This will:
+   - Mark the phase as APPROVED
+   - Create an override record
+   - Commit changes to git
+   - Proceed to the next phase
+   
+   Are you sure you want to approve this phase? (yes/no)
+   ```
+   
+   Wait for explicit confirmation before proceeding. If the user says "no", stop.
 
 3. **Mark Phase Approved**
    - Update `<phase>/status.json` with status: "approved"

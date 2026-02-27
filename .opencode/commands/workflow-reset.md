@@ -59,11 +59,29 @@ Before proceeding, validate all inputs:
 1. **Load Current State**
    Read `workflow/<slug>/workflow-state.json`
 
-2. **Confirm Reset**
-   Tell the human:
-   - Which phase will be reset
-   - Current iteration count
-   - What will be preserved vs deleted
+2. **Display Confirmation Prompt**
+   Before resetting, show the human:
+   ```
+   ═══════════════════════════════════════════════════════════════
+   CONFIRM RESET
+   ═══════════════════════════════════════════════════════════════
+   
+   Feature:      <slug>
+   Phase:        <phase to reset> (or "ALL PHASES" if resetting all)
+   Iterations:   <N> completed
+   
+   This will:
+   - Archive existing reviews to reviews/archived-<timestamp>/
+   - Reset iteration count to 0
+   - Clear current feedback
+   - Restart the creator/reviewer cycle
+   
+   ⚠️  WARNING: This action cannot be undone!
+   
+   Are you sure you want to reset? (yes/no)
+   ```
+   
+   Wait for explicit confirmation before proceeding. If the user says "no", stop.
 
 3. **Reset Phase State**
    Update `workflow/<slug>/<phase>/status.json`:
