@@ -12,6 +12,19 @@ metadata:
 
 This skill provides instructions for managing the gated development workflow state.
 
+## State Management Responsibilities
+
+**Orchestrator Agent**: Responsible for ALL state file updates
+- Creates initial workflow-state.json and status.json files
+- Updates state after each creator/reviewer cycle
+- Manages phase transitions
+- Handles escalation state
+
+**Creator/Reviewer Agents**: Read-only access to state
+- May read state files to understand context
+- Must NOT modify state files
+- Report their output to orchestrator who updates state
+
 ## File Locations
 
 - **Workflow root:** `workflow/<feature-slug>/`
