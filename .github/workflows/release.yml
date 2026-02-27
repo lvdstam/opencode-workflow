@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create zip files
+        run: |
+          # Create versioned zip
+          zip -r workflow-${{ steps.version.outputs.VERSION }}.zip \
+            .opencode/ \
+            .tools/ \
+            AGENTS.md \
+            README.md
+
+          # Create latest zip (same content, stable filename)
+          cp workflow-${{ steps.version.outputs.VERSION }}.zip workflow-latest.zip
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            workflow-${{ steps.version.outputs.VERSION }}.zip
+            workflow-latest.zip
+          generate_release_notes: true
