@@ -61,7 +61,7 @@ Before proceeding, validate all inputs:
 
 3. **Phase Details**
    For each phase, show:
-   - Status (pending/in_progress/in_review/approved/escalated)
+   - Status (pending/in_progress/in_review/user_review/approved/escalated)
    - Iteration count
    - Started/completed timestamps
    - Latest review decision (if any)
@@ -75,8 +75,9 @@ Before proceeding, validate all inputs:
 6. **Next Steps**
    Based on current state, recommend:
    - If in_progress: Continue with `/workflow-continue $ARGUMENTS`
+   - If user_review: Review the PR and approve, then `/workflow-continue $ARGUMENTS`
    - If escalated: Describe what needs human decision
-   - If completed: Show PR URL or suggest PR creation
+   - If completed: Show PR URL, suggest merge then `/workflow-finalize $ARGUMENTS`
 
 ## Output Format
 
@@ -94,24 +95,18 @@ Updated:    <date>
 PHASES
 ───────────────────────────────────────────────────────────────
 [✓] 01-requirements    │ approved    │ 2 iterations │ <date>
-[→] 02-architecture    │ in_review   │ 1 iteration  │ <date>
+[⏳] 02-architecture    │ user_review │ 1 iteration  │ <date>
 [ ] 03-implementation  │ pending     │ -            │ -
 [ ] 04-testing         │ pending     │ -            │ -
 [ ] 05-documentation   │ pending     │ -            │ -
 
 CURRENT PHASE: 02-architecture
 ───────────────────────────────────────────────────────────────
-Status: in_review
+Status: user_review (waiting for your review on the PR)
 Iterations: 1 of 4 max
-Last review: NEEDS_REVISION (review-1.md)
-
-RECENT REVIEWS
-───────────────────────────────────────────────────────────────
-• 02-architecture/reviews/review-1.md: NEEDS_REVISION
-• 01-requirements/reviews/review-2.md: APPROVED
-• 01-requirements/reviews/review-1.md: NEEDS_REVISION
+Internal review: APPROVED
 
 NEXT STEPS
 ───────────────────────────────────────────────────────────────
-Run: /workflow-continue <slug>
+Review the PR, approve, then: /workflow-continue <slug>
 ```

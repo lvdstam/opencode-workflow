@@ -98,7 +98,7 @@ The `workflow-state.json` tracks overall progress:
   "status": "in_progress|completed|finalized|escalated",
   "phases": {
     "01-requirements": {
-      "status": "pending|in_progress|in_review|approved|escalated",
+      "status": "pending|in_progress|in_review|user_review|approved|escalated",
       "iterations": 0,
       "started_at": null,
       "completed_at": null,
@@ -106,7 +106,9 @@ The `workflow-state.json` tracks overall progress:
     }
   },
   "escalations": [],
-  "pr_url": null
+  "pr_url": null,
+  "pr_number": null,
+  "last_reviewed_at": null
 }
 ```
 
@@ -116,7 +118,7 @@ Each phase has a `status.json`:
 ```json
 {
   "phase": "01-requirements",
-  "status": "pending|in_progress|in_review|approved|escalated",
+  "status": "pending|in_progress|in_review|user_review|approved|escalated",
   "iterations": 0,
   "max_iterations": 4,
   "current_feedback": null,
@@ -124,22 +126,102 @@ Each phase has a `status.json`:
 }
 ```
 
-## Execution Protocol
+## Human-Gated Execution Model
 
-### Starting a New Phase
+Every phase goes through **two levels of review**:
+1. **Internal review** — automated creator/reviewer cycle (max 4 iterations)
+2. **User review** — human reviews the PR on GitHub, leaves file-level comments or approves
 
-1. Update `workflow-state.json` with `current_phase` and status `in_progress`
-2. Create `status.json` for the phase if it doesn't exist
-3. Gather context from previous phases (read their artifacts)
-4. Invoke the creator agent with appropriate context
+The workflow pauses after each phase's internal review completes, waiting for the
+human to review on GitHub before advancing. This gives the human full control over
+each phase's output.
 
-### Creator/Reviewer Cycle
+### Overall Flow
+
+```
+/workflow-start:
+  1. Scaffold workspace, seed docs, create branch
+  2. Run phase 01 internal creator/reviewer cycle
+  3. Commit, push, CREATE PR immediately
+  4. Set phase 01 status to "user_review"
+  5. STOP — wait for human to review on GitHub
+
+/workflow-continue (repeated for each phase):
+  1. Read PR review state from GitHub
+  2. If unresolved comments exist:
+     - Map comments to phases by file path
+     - If earliest commented phase < current phase: REGRESS
+     - Feed user comments to creator, run internal cycle
+     - Commit, push, set to "user_review", STOP
+  3. If PR has "APPROVED" review and no unresolved comments:
+     - Mark current phase as "approved"
+     - If more phases remain: start next phase, run internal cycle,
+       commit, push, set to "user_review", STOP
+     - If all phases done: mark workflow "completed", STOP
+  4. If no review submitted (no approval, no comments):
+     - STOP — remind user to review the PR
+```
+
+### Reading PR Feedback from GitHub
+
+Use the GitHub REST API via `gh api` to read PR review state:
+
+1. **Top-level review decision** — determines if user approved:
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/<pr_number>/reviews
+   ```
+   Check for the latest review with `state: "APPROVED"`. A review with
+   `state: "CHANGES_REQUESTED"` means the user wants rework.
+
+2. **File-level review comments** — the primary feedback mechanism:
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/<pr_number>/comments
+   ```
+   Each comment includes `path`, `body`, `line`, `created_at`, and `in_reply_to_id`.
+
+   **Why this API**: We need the `path` field to map comments to specific phases.
+   `gh pr view --json` provides review summaries but not file-level comment paths.
+
+3. **Filtering new comments**: Compare each comment's `created_at` against
+   `last_reviewed_at` in `workflow-state.json`. Only process comments newer than
+   the last time `/workflow-continue` ran.
+
+4. **Mapping comments to phases by file path**:
+   - `workflow/<slug>/01-requirements/*` → phase `01-requirements`
+   - `workflow/<slug>/02-architecture/*` → phase `02-architecture`
+   - `workflow/<slug>/03-implementation/*` → phase `03-implementation`
+   - `workflow/<slug>/04-testing/*` → phase `04-testing`
+   - `workflow/<slug>/05-documentation/*` → phase `05-documentation`
+   - Comments on source code files (outside `workflow/`) → phase `03-implementation`
+
+### Phase Regression Protocol
+
+When a user leaves a comment on a file belonging to phase N, and the current phase
+is M (where M > N), the workflow must **regress**:
+
+1. Set `current_phase` to phase N
+2. Set phase N status to `in_progress`
+3. Set ALL phases after N (N+1 through M) to `pending` — they were built on N's
+   output and may need to be re-run after rework
+4. Reset iteration counts for the reset phases to 0
+5. Feed the user's comments as feedback to phase N's creator agent
+6. Run the internal creator/reviewer cycle for phase N
+7. After internal approval: commit, push, set to `user_review`, STOP
+8. The user reviews again; if satisfied, `/workflow-continue` re-advances through
+   subsequent phases sequentially (each getting its own user review gate)
+
+**Important**: Phase regression resets later phases because they depend on earlier
+outputs. This ensures consistency across the entire workflow.
+
+### Internal Creator/Reviewer Cycle
+
+Within each phase, the internal cycle works as before:
 
 1. **Invoke Creator**: Call `@<phase>-creator` with:
    - Feature description from `00-feature/description.md`
    - Previous phase artifacts (if not first phase)
-   - Current reviewer feedback (if iteration > 1)
-   - After creator completes, update phase status to `in_progress` (artifact created)
+   - Current feedback (reviewer feedback OR user PR comments)
+   - After creator completes, update phase status to `in_progress`
 
 2. **Invoke Reviewer**: Call `@<phase>-reviewer` with:
    - The created artifact
@@ -148,40 +230,44 @@ Each phase has a `status.json`:
    - **Before invoking reviewer**: Update phase status to `in_review`
 
 3. **Process Review Result**:
-   - If `APPROVED`: 
-     - Update status to `approved`
+   - If `APPROVED`:
      - Commit changes: `git add . && git commit -m "[workflow] <phase>: <summary>"`
-     - Advance to next phase
+     - Push to remote: `git push`
+     - Update phase status to `user_review`
+     - Update `workflow-state.json`
+     - **STOP** — wait for human to review on GitHub
    - If `NEEDS_REVISION`:
      - Increment iteration count
-     - If iterations >= 4: Escalate to human (after 4th iteration without approval)
+     - If iterations >= 4: Escalate to human
      - Otherwise: Return to step 1 with feedback
 
 ### Escalation Protocol
 
-When escalating (iterations >= 4 without approval):
+When escalating (iterations >= 4 without internal approval):
 
 1. Update phase status to `escalated`
 2. Update workflow status to `escalated`
 3. Add entry to `escalations` array in workflow-state.json
-4. **STOP and clearly inform the human**:
+4. Commit and push current state
+5. **STOP and clearly inform the human**:
    - Current phase and iteration count
    - Summary of the creator/reviewer disagreement
    - All review feedback from the cycle
    - Your recommendation for resolution
-5. Wait for human guidance before proceeding
+6. Wait for human guidance before proceeding
 
-### Phase Completion
+### PR Creation (After First Phase)
 
-When all phases complete:
-1. Ensure all changes are committed
-2. Push branch to remote: `git push -u origin <branch>`
-3. Create PR using the template below
-4. Update `pr_url` in workflow-state.json
-5. Inform human that PR is ready for review
-6. **Remind the human** to run `/workflow-finalize <slug>` after approving the PR
-   - This publishes updated docs to `docs/` and removes the `workflow/<slug>/` workspace
-   - The finalize step is intentionally separate so the human has full control over when artifacts are cleaned up
+The PR is created immediately after the first phase's internal review passes.
+All subsequent phases push to the same branch and the PR updates automatically.
+
+1. After phase 01 internal review passes: commit, push
+2. Create PR:
+   ```bash
+   gh pr create --title "[Feature] <feature-title>" --body "..."
+   ```
+3. Extract `pr_number` from the created PR and store in `workflow-state.json`
+4. Set `pr_url` in `workflow-state.json`
 
 ### PR Body Template
 
@@ -193,51 +279,64 @@ gh pr create --title "[Feature] <feature-title>" --body "$(cat <<'EOF'
 
 <Brief description of the feature>
 
-## Changes
+## How This PR Works
 
-### Requirements
-- <Key requirements implemented>
+This PR is built incrementally, one phase at a time. After each phase completes
+its internal review, the workflow pauses for your review.
 
-### Architecture
-- <Key architectural decisions>
+**Review process:**
+1. Review the latest changes pushed for the current phase
+2. Leave file-level comments on any issues (comments on earlier phase files will trigger rework from that phase)
+3. When satisfied, submit a review with **Approve**
+4. Then run `/workflow-continue <slug>` to advance to the next phase
 
-### Implementation
-- <Main code changes>
-
-### Testing
-- <Test coverage summary>
-
-### Documentation
-- <Documentation added/updated>
+**Phases:**
+- [ ] 01-requirements
+- [ ] 02-architecture
+- [ ] 03-implementation
+- [ ] 04-testing
+- [ ] 05-documentation
 
 ## Workflow Artifacts
 
-All workflow artifacts are in `workflow/<feature-slug>/`:
+Artifacts are in `workflow/<feature-slug>/`:
 - Requirements: `01-requirements/requirements.md`
 - Architecture: `02-architecture/architecture.md`
 - Implementation: `03-implementation/changes.md`
 - Testing: `04-testing/coverage-report.md`
 - Documentation: `05-documentation/user-docs.md`
 
-## Next Steps
+## After All Phases Complete
 
-After approving this PR, run `/workflow-finalize <feature-slug>` to:
-- Publish updated docs from the workspace to `docs/`
-- Remove the `workflow/<feature-slug>/` directory
-- The PR will then contain only source code, tests, and updated central docs
-
-## Review Notes
-
-<Any special considerations for reviewers>
+Once all phases are approved, merge this PR, then run:
+```
+/workflow-finalize <feature-slug>
+```
+This publishes docs to `docs/` and removes the workspace.
 EOF
 )"
 ```
+
+### Workflow Completion
+
+When the final phase (05-documentation) passes user review:
+1. Mark all phases as `approved` and workflow status as `completed`
+2. Commit and push final state
+3. Inform human:
+   ```
+   All 5 phases are complete and approved.
+   
+   Next steps:
+   1. Merge the PR: <pr_url>
+   2. After merge, run: /workflow-finalize <slug>
+   ```
 
 ## Git Protocol
 
 - **Branch naming**: `feature/<feature-slug>`
 - **Commit messages**: `[workflow] <phase>: <brief summary>`
-- **One commit per phase approval**
+- **One commit per phase** (internal approval), plus additional commits for rework
+- Push after every internal approval and after every rework
 - Never force push or rebase without explicit human approval
 
 ## Context Passing Between Phases

@@ -62,16 +62,16 @@ should keep both files in sync, but if they diverge, trust `workflow-state.json`
   "status": "in_progress",
   "phases": {
     "01-requirements": {
-      "status": "approved",
+      "status": "user_review",
       "iterations": 2,
       "started_at": "2026-02-27T10:00:00Z",
-      "completed_at": "2026-02-27T10:30:00Z",
+      "completed_at": null,
       "escalation_reason": null
     },
     "02-architecture": {
-      "status": "in_progress",
+      "status": "pending",
       "iterations": 0,
-      "started_at": "2026-02-27T10:30:00Z",
+      "started_at": null,
       "completed_at": null,
       "escalation_reason": null
     },
@@ -97,18 +97,16 @@ should keep both files in sync, but if they diverge, trust `workflow-state.json`
       "escalation_reason": null
     }
   },
-  "escalations": [
-    {
-      "phase": "01-requirements",
-      "iteration": 4,
-      "timestamp": "2026-02-27T11:00:00Z",
-      "reason": "Creator and reviewer could not agree on scope",
-      "resolution": "Human approved with modifications"
-    }
-  ],
-  "pr_url": null
+  "escalations": [],
+  "pr_url": null,
+  "pr_number": null,
+  "last_reviewed_at": null
 }
 ```
+
+Note the new fields compared to earlier versions:
+- `pr_number` — needed for GitHub API calls to read review comments
+- `last_reviewed_at` — timestamp of last processed PR review, used to filter new comments
 
 ## Phase Status Schema (`status.json`)
 
@@ -149,8 +147,9 @@ should keep both files in sync, but if they diverge, trust `workflow-state.json`
 ### Phase Status
 - `pending` - Not yet started
 - `in_progress` - Creator working on artifact
-- `in_review` - Reviewer evaluating artifact
-- `approved` - Passed review, complete
+- `in_review` - Internal reviewer evaluating artifact
+- `user_review` - Internal review passed, waiting for human review on GitHub PR
+- `approved` - Passed both internal and user review, complete
 - `escalated` - Hit max iterations, needs human
 
 ## State Transitions
@@ -159,8 +158,11 @@ should keep both files in sync, but if they diverge, trust `workflow-state.json`
 pending → in_progress (when phase starts)
 in_progress → in_review (when creator completes artifact)
 in_review → in_progress (when reviewer requests revision)
-in_review → approved (when reviewer approves)
+in_review → user_review (when internal reviewer approves — pushed to PR)
 in_review → escalated (when iterations >= max_iterations, i.e., after 4th iteration)
+user_review → approved (when human approves on GitHub with no unresolved comments)
+user_review → in_progress (when human leaves PR comments requesting changes)
+approved → in_progress (phase regression: human commented on earlier phase's files)
 escalated → in_progress (when human provides guidance)
 escalated → approved (when human overrides)
 ```
@@ -240,12 +242,51 @@ After publishing, the entire `workflow/<slug>/` directory is deleted.
 }
 ```
 
-### After Reviewer Approves
+### After Internal Reviewer Approves
+```json
+{
+  "status": "user_review",
+  "current_feedback": null
+}
+```
+
+### After User Approves on GitHub
 ```json
 {
   "status": "approved",
   "completed_at": "<timestamp>",
   "current_feedback": null
+}
+```
+
+### After User Requests Changes (PR comments)
+```json
+{
+  "status": "in_progress",
+  "current_feedback": "<aggregated user comments from PR>"
+}
+```
+
+### Phase Regression (user commented on earlier phase)
+When user comments on files belonging to phase N while current phase is M (M > N):
+```json
+// Phase N:
+{
+  "status": "in_progress",
+  "current_feedback": "<user comments from PR>"
+}
+
+// Phases N+1 through M: reset to pending
+{
+  "status": "pending",
+  "iterations": 0,
+  "started_at": null,
+  "completed_at": null
+}
+
+// workflow-state.json:
+{
+  "current_phase": "<phase N>"
 }
 ```
 

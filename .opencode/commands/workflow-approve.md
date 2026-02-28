@@ -34,6 +34,11 @@ Before proceeding, validate all inputs:
      Current phase is already approved. 
      Use /workflow-continue $ARGUMENTS to proceed.
      ```
+   - This command works when phase status is:
+     - `user_review` — skips waiting for GitHub PR review
+     - `in_review` — skips remaining internal review
+     - `in_progress` — skips current iteration
+     - `escalated` — overrides escalation
 
 ## Your Tasks
 
@@ -87,5 +92,10 @@ Before proceeding, validate all inputs:
 
 6. **Proceed to Next Phase**
    - Update current_phase in workflow-state.json
-   - Begin the next phase's creator/reviewer cycle
-   - Or create PR if this was the last phase
+   - If more phases remain:
+     - Begin the next phase's internal creator/reviewer cycle
+     - After internal approval: commit, push, set to `user_review`
+     - STOP — wait for user review on PR
+   - If this was the last phase:
+     - Set workflow status to `completed`
+     - Inform user to merge PR and run `/workflow-finalize`

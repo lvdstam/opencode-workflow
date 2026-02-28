@@ -16,7 +16,7 @@ Each phase has:
 - A **reviewer agent** that evaluates quality
 - Up to **4 iterations** before human escalation
 - **Git commits** after each phase approval
-- A **PR** created when all phases complete
+- **Human review on the PR** before advancing to the next phase
 
 Documentation follows a **copy-edit-publish** lifecycle:
 - **Seed**: Central `docs/` are copied into the workflow workspace at start
@@ -123,12 +123,30 @@ workflow/
 
 ## Workflow Rules
 
-### Creator/Reviewer Cycle
+### Two-Level Review Per Phase
+Each phase goes through two levels of review:
+1. **Internal review** — automated creator/reviewer cycle (max 4 iterations)
+2. **User review** — human reviews the PR on GitHub
+
+The workflow pauses after each phase's internal review, waiting for human
+approval on the PR before advancing.
+
+### Creator/Reviewer Cycle (Internal)
 1. Creator produces artifact
 2. Reviewer evaluates with APPROVED or NEEDS_REVISION
 3. If NEEDS_REVISION: Creator revises based on feedback
 4. Maximum 4 iterations before escalating to human
-5. On APPROVED: Commit and advance to next phase
+5. On APPROVED: Commit, push, and wait for user review on PR
+
+### User Review (GitHub PR)
+After internal review passes:
+1. User reviews changes on the PR
+2. Leaves file-level comments on any issues
+3. Submits "Approve" review when satisfied
+4. Runs `/workflow-continue <slug>` to advance
+
+If the user comments on files from an **earlier** phase, the workflow
+regresses to that phase — all later phases are reset and re-run.
 
 ### Review Standards
 - **Consistent throughout** - Same rigor for all iterations
@@ -138,10 +156,11 @@ workflow/
 
 ### Git Protocol
 - All work on feature branch: `feature/<slug>`
+- PR created immediately after the first phase completes internal review
 - Commit after each phase: `[workflow] <phase>: <summary>`
-- PR created when documentation phase completes
-- Human reviews PR before merge
-- After merge: `/workflow-finalize` publishes docs and cleans up workspace
+- Push after every commit — the PR updates automatically
+- Human reviews PR between each phase
+- After all phases approved and PR merged: `/workflow-finalize` publishes docs and cleans up workspace
 
 ### Human Escalation
 After 4 iterations without approval:

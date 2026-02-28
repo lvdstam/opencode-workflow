@@ -180,7 +180,9 @@ Before proceeding, validate all inputs:
        "05-documentation": { "status": "pending", "iterations": 0, "started_at": null, "completed_at": null }
      },
      "escalations": [],
-     "pr_url": null
+     "pr_url": null,
+     "pr_number": null,
+     "last_reviewed_at": null
    }
    ```
 
@@ -212,16 +214,43 @@ Before proceeding, validate all inputs:
    If no `docs/` directory exists (first workflow), skip this step entirely — creators
    will start from their templates.
 
-8. **Begin Requirements Phase**
+8. **Run Requirements Phase (Internal Review Only)**
    - Invoke `@requirements-creator` with the feature description
    - After creation, invoke `@requirements-reviewer` to review
-   - Handle the creator/reviewer cycle (max 4 iterations)
+   - Handle the internal creator/reviewer cycle (max 4 iterations)
    - Update status files after each iteration
-   - Commit on approval and proceed to next phase
+   - On internal approval: commit changes
+
+9. **Push and Create PR**
+   After the requirements phase passes internal review:
+   - Push to remote: `git push -u origin feature/<slug>`
+   - Create the PR using the template from the orchestrator's PR Body Template
+   - Extract the PR number and URL from the created PR
+   - Update `workflow-state.json` with `pr_url`, `pr_number`
+   - Set phase 01 status to `user_review`
+
+10. **STOP — Wait for Human Review**
+    Inform the human:
+    ```
+    Requirements phase complete (internal review passed).
+    
+    PR created: <pr_url>
+    
+    Next steps:
+    1. Review the requirements on the PR
+    2. Leave file-level comments on any issues
+    3. When satisfied, submit a review with "Approve"
+    4. Then run: /workflow-continue <slug>
+    ```
+    
+    Do NOT proceed to the architecture phase. Wait for the human to review
+    and approve on GitHub, then continue via `/workflow-continue`.
 
 ## Important
 
 - Always update `workflow-state.json` when changing phases
 - Create review files in the `reviews/` subdirectory
-- Commit after each phase approval with message: `[workflow] <phase>: <summary>`
-- If 4 iterations pass without approval, escalate to human
+- Commit after each phase's internal approval with message: `[workflow] <phase>: <summary>`
+- Push after every commit — the PR updates automatically
+- If 4 iterations pass without internal approval, escalate to human
+- The workflow pauses after each phase for human review on the PR
