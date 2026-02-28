@@ -28,7 +28,7 @@ jobs:
           cp README.md WORKFLOW-README.md
 
           # Create versioned zip
-          zip -r workflow-${{ steps.version.outputs.VERSION }}.zip \
+          zip -r opencode-workflow-${{ steps.version.outputs.VERSION }}.zip \
             .opencode/ \
             .tools/ \
             .opencode-workflow-version \
@@ -36,12 +36,38 @@ jobs:
             WORKFLOW-README.md
 
           # Create latest zip (same content, stable filename)
-          cp workflow-${{ steps.version.outputs.VERSION }}.zip workflow-latest.zip
+          cp opencode-workflow-${{ steps.version.outputs.VERSION }}.zip opencode-workflow-latest.zip
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            workflow-${{ steps.version.outputs.VERSION }}.zip
-            workflow-latest.zip
+            opencode-workflow-${{ steps.version.outputs.VERSION }}.zip
           generate_release_notes: true
+          make_latest: true
+
+      - name: Update latest release with opencode-workflow-latest.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create or update a fixed "latest" release that always has opencode-workflow-latest.zip
+          # This provides a stable download URL: releases/download/latest/opencode-workflow-latest.zip
+          # Move the 'latest' tag to current commit
+          git tag -f latest
+          git push -f origin latest
+
+          if gh release view latest &>/dev/null; then
+            # Update existing latest release: replace the zip asset
+            gh release delete-asset latest opencode-workflow-latest.zip --yes 2>/dev/null || true
+            gh release upload latest opencode-workflow-latest.zip
+            gh release edit latest \
+              --title "Latest Release" \
+              --notes "Latest workflow release: ${{ steps.version.outputs.VERSION }}" \
+              --latest=false
+          else
+            # Create the latest release for the first time
+            gh release create latest opencode-workflow-latest.zip \
+              --title "Latest Release" \
+              --notes "Latest workflow release: ${{ steps.version.outputs.VERSION }}" \
+              --latest=false
+          fi
