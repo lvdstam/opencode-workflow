@@ -29,6 +29,7 @@ This skill provides instructions for managing the gated development workflow sta
 
 - **Workflow root:** `workflow/<feature-slug>/`
 - **Feature description:** `workflow/<feature>/00-feature/description.md`
+- **Feature log:** `workflow/<feature>/00-feature/features.md` (seeded from `docs/features.md`)
 - **Workflow state:** `workflow/<feature>/workflow-state.json` (PRIMARY source of truth)
 - **Phase status:** `workflow/<feature>/<phase>/status.json` (per-phase detail)
 - **Reviews:** `workflow/<feature>/<phase>/reviews/review-<N>.md`
@@ -191,6 +192,7 @@ Central docs are copied into the workspace as starting points:
 
 | Central (source)         | Workspace (destination)                              |
 |--------------------------|------------------------------------------------------|
+| `docs/features.md`      | `workflow/<slug>/00-feature/features.md`              |
 | `docs/requirements.md`  | `workflow/<slug>/01-requirements/requirements.md`    |
 | `docs/architecture.md`  | `workflow/<slug>/02-architecture/architecture.md`    |
 | `docs/diagrams/*`       | `workflow/<slug>/02-architecture/diagrams/`           |
@@ -205,6 +207,7 @@ Updated workspace docs are published back to central:
 
 | Workspace (source)                                    | Central (destination)      |
 |-------------------------------------------------------|----------------------------|
+| `workflow/<slug>/00-feature/features.md`              | `docs/features.md`         |
 | `workflow/<slug>/01-requirements/requirements.md`     | `docs/requirements.md`     |
 | `workflow/<slug>/02-architecture/architecture.md`     | `docs/architecture.md`     |
 | `workflow/<slug>/02-architecture/diagrams/*`          | `docs/diagrams/`           |

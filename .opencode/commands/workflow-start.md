@@ -205,6 +205,7 @@ Before proceeding, validate all inputs:
    rather than creating documents from scratch.
 
    Copy the following files (skip any that don't exist yet):
+   - `docs/features.md`     → `workflow/<slug>/00-feature/features.md`
    - `docs/requirements.md` → `workflow/<slug>/01-requirements/requirements.md`
    - `docs/architecture.md` → `workflow/<slug>/02-architecture/architecture.md`
    - `docs/diagrams/*`      → `workflow/<slug>/02-architecture/diagrams/`
@@ -213,6 +214,34 @@ Before proceeding, validate all inputs:
 
    If no `docs/` directory exists (first workflow), skip this step entirely — creators
    will start from their templates.
+
+   **After seeding**, append the current feature to `workflow/<slug>/00-feature/features.md`.
+   If the file was not seeded (first workflow), create it with a header first:
+
+   ```markdown
+   # Features
+
+   Cumulative log of all features developed through the workflow.
+
+   ---
+   ```
+
+   Then append this entry:
+
+   ```markdown
+   ## <Feature Title>
+
+   - **Slug:** <slug>
+   - **Branch:** feature/<slug>
+   - **Created:** <ISO8601 timestamp>
+   - **Status:** in_progress
+
+   ### Description
+
+   <The feature description provided>
+
+   ---
+   ```
 
 8. **Run Requirements Phase (Internal Review Only)**
    - Invoke `@requirements-creator` with the feature description

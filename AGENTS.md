@@ -67,6 +67,7 @@ Or list all workflows:
 ### Central Documentation (persistent)
 ```
 docs/
+├── features.md              # Cumulative feature log
 ├── requirements.md          # Cumulative project requirements
 ├── architecture.md          # Current system architecture
 ├── diagrams/                # Architecture diagrams
@@ -79,7 +80,8 @@ docs/
 workflow/
 └── <feature-slug>/
     ├── 00-feature/
-    │   └── description.md          # Original feature request
+    │   ├── description.md          # Original feature request
+    │   └── features.md             # Cumulative feature log (seeded from docs/)
     ├── 01-requirements/
     │   ├── requirements.md         # Requirements (seeded from docs/)
     │   ├── reviews/                # Review history

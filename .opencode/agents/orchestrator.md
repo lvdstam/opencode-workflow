@@ -37,6 +37,7 @@ The workflow consists of 5 sequential phases:
 ### Central Documentation (persistent, survives across features)
 ```
 docs/
+├── features.md              # Cumulative feature log
 ├── requirements.md          # Cumulative project requirements
 ├── architecture.md          # Current system architecture
 ├── diagrams/                # Architecture diagrams
@@ -48,7 +49,8 @@ docs/
 ```
 workflow/<feature-slug>/
 ├── 00-feature/
-│   └── description.md          # Original feature request
+│   ├── description.md          # Original feature request
+│   └── features.md             # Cumulative feature log (seeded from docs/)
 ├── 01-requirements/
 │   ├── requirements.md         # Requirements (seeded from docs/)
 │   ├── reviews/                # Review history
@@ -79,8 +81,8 @@ workflow/<feature-slug>/
 
 ### Copy-Edit-Publish Lifecycle
 
-1. **Seed**: `/workflow-start` copies `docs/*` into `workflow/<slug>/` as starting points
-2. **Edit**: Creator agents extend/update the workspace copies during each phase
+1. **Seed**: `/workflow-start` copies `docs/*` into `workflow/<slug>/` as starting points (including `features.md` into `00-feature/`)
+2. **Edit**: Creator agents extend/update the workspace copies during each phase; new features are appended to `features.md`
 3. **Review**: PR includes `workflow/<slug>/` so reviewers see all artifacts
 4. **Publish**: `/workflow-finalize` copies updated docs back to `docs/` and deletes the workspace
 

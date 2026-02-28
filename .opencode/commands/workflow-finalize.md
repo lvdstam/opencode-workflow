@@ -82,6 +82,7 @@ Before finalizing, verify the workflow is ready:
 
    This will:
    1. Copy updated docs from workspace to central docs/:
+      - features.md
       - requirements.md
       - architecture.md
       - diagrams/*
@@ -104,6 +105,7 @@ Create `docs/` directory if it doesn't exist, then copy workspace docs:
 
 | Source (workspace)                                    | Destination (central)      |
 |-------------------------------------------------------|----------------------------|
+| `workflow/<slug>/00-feature/features.md`              | `docs/features.md`         |
 | `workflow/<slug>/01-requirements/requirements.md`     | `docs/requirements.md`     |
 | `workflow/<slug>/02-architecture/architecture.md`     | `docs/architecture.md`     |
 | `workflow/<slug>/02-architecture/diagrams/*`          | `docs/diagrams/`           |
@@ -151,6 +153,7 @@ Inform the user:
 Workflow '<slug>' finalized successfully.
 
 Published to docs/:
+  - docs/features.md
   - docs/requirements.md
   - docs/architecture.md
   - docs/diagrams/
