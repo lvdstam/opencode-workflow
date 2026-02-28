@@ -150,10 +150,10 @@ each phase's output.
 
 /workflow-continue (repeated for each phase):
   1. Read PR review state from GitHub
-  2. If unresolved comments exist:
+  2. If "CHANGES_REQUESTED" or unresolved comments exist:
      - Map comments to phases by file path
      - If earliest commented phase < current phase: REGRESS
-     - Feed user comments to creator, run internal cycle
+     - Feed user comments to creator, run full internal cycle
      - Commit, push, set to "user_review", STOP
   3. If PR has "APPROVED" review and no unresolved comments:
      - Mark current phase as "approved"
@@ -217,7 +217,9 @@ outputs. This ensures consistency across the entire workflow.
 
 ### Internal Creator/Reviewer Cycle
 
-Within each phase, the internal cycle works as before:
+Within each phase, the internal cycle **must run to completion** before the user is
+asked to review. The phase only reaches `user_review` status after the internal
+reviewer has approved — never before.
 
 1. **Invoke Creator**: Call `@<phase>-creator` with:
    - Feature description from `00-feature/description.md`
@@ -242,6 +244,40 @@ Within each phase, the internal cycle works as before:
      - Increment iteration count
      - If iterations >= 4: Escalate to human
      - Otherwise: Return to step 1 with feedback
+
+**Important**: This cycle applies identically whether it is the first run of a phase
+or a rework triggered by user PR comments. In both cases, the internal reviewer must
+approve before the user sees the result. The user is never asked to review work that
+has not passed internal review.
+
+### Handling User PR Comments
+
+When user PR comments are fed back to a creator agent for rework:
+
+1. **Preserve user comments in the artifact**: The creator must NOT silently address
+   comments. Instead, for each user comment, the creator appends a response block
+   at the relevant location in the artifact (or in a dedicated "Comment Responses"
+   section if location-specific placement isn't practical):
+
+   ```markdown
+   > **User comment:** <quoted user comment>
+   
+   **Response:** <explanation of how this was addressed, what changed, and why>
+   ```
+
+2. **User resolves their own comments**: After rework is pushed, the user reviews
+   the responses on the PR. The user decides whether each comment is satisfactorily
+   addressed and resolves it themselves on GitHub. The workflow does NOT auto-resolve
+   comments.
+
+3. **Unresolved comments block advancement**: As long as unresolved PR comments
+   exist, `/workflow-continue` will not advance to the next phase — it will
+   re-enter the rework cycle for the phase those comments belong to.
+
+When passing user comments to the creator agent, include:
+- The exact comment text
+- The file path and line number (if available)
+- Instruction to preserve the comment and document the response in the artifact
 
 ### Escalation Protocol
 
@@ -288,9 +324,18 @@ its internal review, the workflow pauses for your review.
 
 **Review process:**
 1. Review the latest changes pushed for the current phase
-2. Leave file-level comments on any issues (comments on earlier phase files will trigger rework from that phase)
-3. When satisfied, submit a review with **Approve**
-4. Then run `/workflow-continue <slug>` to advance to the next phase
+2. Leave file-level comments on any issues
+3. Submit your review:
+   - **Request changes** — if you have comments that need to be addressed
+   - **Approve** — when you are satisfied with the phase
+4. Then run `/workflow-continue <slug>` to advance
+
+**Comment handling:**
+- Your file-level comments will be fed to the creator agent for rework
+- The creator preserves your comments in the artifact with a response
+  explaining how each was addressed
+- You review the responses and resolve your own comments when satisfied
+- Comments on earlier phase files trigger regression to that phase
 
 **Phases:**
 - [ ] 01-requirements

@@ -268,7 +268,9 @@ Before proceeding, validate all inputs:
     Next steps:
     1. Review the requirements on the PR
     2. Leave file-level comments on any issues
-    3. When satisfied, submit a review with "Approve"
+    3. Submit your review:
+       - "Request changes" if you have comments
+       - "Approve" when satisfied
     4. Then run: /workflow-continue <slug>
     ```
     

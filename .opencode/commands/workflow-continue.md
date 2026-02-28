@@ -134,17 +134,21 @@ Before proceeding, validate all inputs:
 
    ### Step 5c: Process Based on Review State
 
-   **Case 1: User has unresolved PR comments**
+   **Case 1: User submitted "Request changes" or has unresolved PR comments**
    
    Determine the EARLIEST phase that has comments.
 
    - If the earliest commented phase is the current phase:
      - Set phase status to `in_progress`
      - Set `current_feedback` to the aggregated user comments
-     - Run the internal creator/reviewer cycle with user feedback
+     - Run the **full** internal creator/reviewer cycle with user feedback
+       (the internal reviewer must approve before returning to user review)
+     - **Important**: Instruct the creator to preserve each user comment in the
+       artifact with a response explaining how it was addressed. The user will
+       review these responses and resolve their own comments on the PR.
      - After internal approval: commit, push, set to `user_review`
      - Update `last_reviewed_at` in workflow-state.json
-     - STOP — wait for user to re-review
+     - STOP — wait for user to re-review and resolve their comments
 
    - If the earliest commented phase is EARLIER than the current phase (REGRESSION):
      - Follow the Phase Regression Protocol (see below)
@@ -188,8 +192,8 @@ Before proceeding, validate all inputs:
    Current phase: <phase> (status: user_review)
    
    Please review the changes and either:
-   - Leave file-level comments for changes you'd like
-   - Submit an "Approve" review when satisfied
+   - Submit "Request changes" with file-level comments for issues
+   - Submit "Approve" when satisfied
    Then run /workflow-continue <slug>
    ```
 
@@ -201,7 +205,8 @@ Before proceeding, validate all inputs:
    2. Set phase N status to `in_progress` with user comments as `current_feedback`
    3. Set ALL phases after N (N+1 through M) status to `pending`, reset their
       `iterations` to 0, clear `started_at` and `completed_at`
-   4. Run the internal creator/reviewer cycle for phase N with user feedback
+   4. Run the **full** internal creator/reviewer cycle for phase N with user feedback
+      (internal reviewer must approve before returning to user review)
    5. After internal approval: commit, push, set to `user_review`
    6. Update `last_reviewed_at`
    7. STOP — inform user:
@@ -210,7 +215,10 @@ Before proceeding, validate all inputs:
       Phases <N+1> through <M> have been reset and will be re-run after
       you approve the reworked phase <N>.
       
-      Review the changes on the PR, then approve and /workflow-continue.
+      Your original comments have been preserved in the artifact with
+      responses explaining how each was addressed. Please review the
+      changes, resolve your comments if satisfied, then approve and
+      /workflow-continue.
       ```
 
 6. **Handle Already-Approved Phase**

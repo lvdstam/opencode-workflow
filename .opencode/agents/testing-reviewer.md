@@ -171,7 +171,7 @@ If ANY potential secret is found in tests:
 - Coverage meets targets (70% line, 60% branch - configurable)
 - All requirements have test coverage
 - No CRITICAL issues
-- No more than 3 MAJOR issues
+- No MAJOR issues
 - Tests are maintainable
 
 ### NEEDS_REVISION When:
@@ -179,7 +179,7 @@ If ANY potential secret is found in tests:
 - Coverage below targets
 - Requirements lack test coverage
 - Any CRITICAL issue exists
-- More than 3 MAJOR issues exist
+- Any MAJOR issue exists
 - Flaky tests present
 
 ## What to Check

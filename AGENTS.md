@@ -144,8 +144,11 @@ approval on the PR before advancing.
 After internal review passes:
 1. User reviews changes on the PR
 2. Leaves file-level comments on any issues
-3. Submits "Approve" review when satisfied
+3. Submits review: **Request changes** or **Approve**
 4. Runs `/workflow-continue <slug>` to advance
+
+User comments are preserved in the artifact with responses explaining how
+each was addressed. The user resolves their own comments when satisfied.
 
 If the user comments on files from an **earlier** phase, the workflow
 regresses to that phase — all later phases are reset and re-run.
@@ -153,7 +156,7 @@ regresses to that phase — all later phases are reset and re-run.
 ### Review Standards
 - **Consistent throughout** - Same rigor for all iterations
 - **CRITICAL issues** - Must be fixed before approval
-- **MAJOR issues** - Should be fixed (max 3 allowed)
+- **MAJOR issues** - Must be fixed before approval
 - **MINOR issues** - Nice to fix, won't block
 
 ### Git Protocol

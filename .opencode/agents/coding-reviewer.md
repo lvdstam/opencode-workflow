@@ -176,7 +176,7 @@ If ANY potential secret is found:
 - Code matches architecture design
 - All requirements are implemented
 - No CRITICAL issues
-- No more than 3 MAJOR issues
+- No MAJOR issues
 - Code is production-ready
 
 ### NEEDS_REVISION When:
@@ -184,7 +184,7 @@ If ANY potential secret is found:
 - Architecture is not followed
 - Requirements are not met
 - Any CRITICAL issue exists
-- More than 3 MAJOR issues exist
+- Any MAJOR issue exists
 - Security vulnerabilities found
 
 ## What to Check

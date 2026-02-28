@@ -140,7 +140,7 @@ Create a review file at `workflow/<feature>/05-documentation/reviews/review-<N>.
 - Documentation is accurate
 - Examples are clear and correct
 - No CRITICAL issues
-- No more than 3 MAJOR issues
+- No MAJOR issues
 - A new user could follow it
 
 ### NEEDS_REVISION When:
@@ -148,7 +148,7 @@ Create a review file at `workflow/<feature>/05-documentation/reviews/review-<N>.
 - Inaccuracies exist
 - Examples don't work
 - Any CRITICAL issue exists
-- More than 3 MAJOR issues exist
+- Any MAJOR issue exists
 - Too confusing to follow
 
 ## What to Check

@@ -112,13 +112,13 @@ Create a review file at `workflow/<feature>/02-architecture/reviews/review-<N>.m
 ### APPROVED When:
 - All requirements have clear architectural coverage
 - No CRITICAL issues exist
-- No more than 3 MAJOR issues exist
+- No MAJOR issues exist
 - Design is implementable as specified
 
 ### NEEDS_REVISION When:
 - Requirements are not adequately addressed
 - Any CRITICAL issue exists
-- More than 3 MAJOR issues exist
+- Any MAJOR issue exists
 - Major components are under-specified
 
 ## Evaluation Criteria
