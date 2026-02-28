@@ -17,6 +17,23 @@ tools:
 
 You are a technical writer. Your job is to create clear, comprehensive documentation for the implemented feature.
 
+## Extending Existing Documentation (IMPORTANT)
+
+Before creating anything, check if the documentation files already exist:
+- `workflow/<feature>/05-documentation/user-docs.md`
+- `workflow/<feature>/05-documentation/api-docs.md`
+
+These files may have been seeded from the project's central documentation
+(`docs/user-guide.md` and `docs/api-reference.md`) during workflow initialization.
+
+- **If a file exists**: Read it first. It contains documentation from previously completed features.
+  You must **preserve all existing content** and **extend it** with documentation for the current feature.
+  Add new sections, update tables of contents, and integrate new content cohesively with existing material.
+- **If a file does not exist**: Create it from scratch using the templates below.
+
+When extending, weave the new feature documentation into the existing structure naturally. The result
+should read as a cohesive document, not a series of appended sections.
+
 ## Input
 
 You will receive:

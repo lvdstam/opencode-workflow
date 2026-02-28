@@ -34,19 +34,29 @@ The workflow consists of 5 sequential phases:
 
 ## Directory Structure
 
-Each feature workflow uses this structure:
+### Central Documentation (persistent, survives across features)
+```
+docs/
+├── requirements.md          # Cumulative project requirements
+├── architecture.md          # Current system architecture
+├── diagrams/                # Architecture diagrams
+├── user-guide.md            # User documentation
+└── api-reference.md         # API documentation
+```
+
+### Feature Workspace (temporary, deleted after finalization)
 ```
 workflow/<feature-slug>/
 ├── 00-feature/
 │   └── description.md          # Original feature request
 ├── 01-requirements/
-│   ├── requirements.md         # Requirements document
+│   ├── requirements.md         # Requirements (seeded from docs/)
 │   ├── reviews/                # Review history
 │   │   └── review-N.md
 │   └── status.json             # Phase status
 ├── 02-architecture/
-│   ├── architecture.md         # Architecture document
-│   ├── diagrams/               # Technical diagrams
+│   ├── architecture.md         # Architecture (seeded from docs/)
+│   ├── diagrams/               # Diagrams (seeded from docs/)
 │   ├── reviews/
 │   └── status.json
 ├── 03-implementation/
@@ -60,12 +70,19 @@ workflow/<feature-slug>/
 │   ├── reviews/
 │   └── status.json
 ├── 05-documentation/
-│   ├── user-docs.md            # User documentation
-│   ├── api-docs.md             # API documentation
+│   ├── user-docs.md            # User docs (seeded from docs/)
+│   ├── api-docs.md             # API docs (seeded from docs/)
 │   ├── reviews/
 │   └── status.json
 └── workflow-state.json         # Overall workflow state
 ```
+
+### Copy-Edit-Publish Lifecycle
+
+1. **Seed**: `/workflow-start` copies `docs/*` into `workflow/<slug>/` as starting points
+2. **Edit**: Creator agents extend/update the workspace copies during each phase
+3. **Review**: PR includes `workflow/<slug>/` so reviewers see all artifacts
+4. **Publish**: `/workflow-finalize` copies updated docs back to `docs/` and deletes the workspace
 
 ## Workflow State Schema
 
@@ -78,7 +95,7 @@ The `workflow-state.json` tracks overall progress:
   "created_at": "ISO8601 timestamp",
   "updated_at": "ISO8601 timestamp",
   "current_phase": "01-requirements",
-  "status": "in_progress|completed|escalated",
+  "status": "in_progress|completed|finalized|escalated",
   "phases": {
     "01-requirements": {
       "status": "pending|in_progress|in_review|approved|escalated",
@@ -162,6 +179,9 @@ When all phases complete:
 3. Create PR using the template below
 4. Update `pr_url` in workflow-state.json
 5. Inform human that PR is ready for review
+6. **Remind the human** to run `/workflow-finalize <slug>` after approving the PR
+   - This publishes updated docs to `docs/` and removes the `workflow/<slug>/` workspace
+   - The finalize step is intentionally separate so the human has full control over when artifacts are cleaned up
 
 ### PR Body Template
 
@@ -198,6 +218,13 @@ All workflow artifacts are in `workflow/<feature-slug>/`:
 - Implementation: `03-implementation/changes.md`
 - Testing: `04-testing/coverage-report.md`
 - Documentation: `05-documentation/user-docs.md`
+
+## Next Steps
+
+After approving this PR, run `/workflow-finalize <feature-slug>` to:
+- Publish updated docs from the workspace to `docs/`
+- Remove the `workflow/<feature-slug>/` directory
+- The PR will then contain only source code, tests, and updated central docs
 
 ## Review Notes
 

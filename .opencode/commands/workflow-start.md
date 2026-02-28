@@ -197,7 +197,22 @@ Before proceeding, validate all inputs:
    }
    ```
 
-7. **Begin Requirements Phase**
+7. **Seed Workspace from Central Docs**
+   Copy existing central documentation into the workspace as starting points for creator agents.
+   This ensures each workflow builds upon the current state of the project's documentation
+   rather than creating documents from scratch.
+
+   Copy the following files (skip any that don't exist yet):
+   - `docs/requirements.md` → `workflow/<slug>/01-requirements/requirements.md`
+   - `docs/architecture.md` → `workflow/<slug>/02-architecture/architecture.md`
+   - `docs/diagrams/*`      → `workflow/<slug>/02-architecture/diagrams/`
+   - `docs/user-guide.md`   → `workflow/<slug>/05-documentation/user-docs.md`
+   - `docs/api-reference.md` → `workflow/<slug>/05-documentation/api-docs.md`
+
+   If no `docs/` directory exists (first workflow), skip this step entirely — creators
+   will start from their templates.
+
+8. **Begin Requirements Phase**
    - Invoke `@requirements-creator` with the feature description
    - After creation, invoke `@requirements-reviewer` to review
    - Handle the creator/reviewer cycle (max 4 iterations)

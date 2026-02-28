@@ -18,6 +18,11 @@ Each phase has:
 - **Git commits** after each phase approval
 - A **PR** created when all phases complete
 
+Documentation follows a **copy-edit-publish** lifecycle:
+- **Seed**: Central `docs/` are copied into the workflow workspace at start
+- **Edit**: Creator agents extend the seeded docs during each phase
+- **Publish**: After PR approval, `/workflow-finalize` copies docs back to `docs/` and deletes the workspace
+
 ## Quick Start
 
 ### Start a New Feature
@@ -52,20 +57,36 @@ Or list all workflows:
 /workflow-cancel <feature-slug>    # Cancel and abandon workflow
 ```
 
+### Finalize (After PR Approval)
+```
+/workflow-finalize <feature-slug>  # Publish docs to docs/, delete workspace
+```
+
 ## Directory Structure
 
+### Central Documentation (persistent)
+```
+docs/
+├── requirements.md          # Cumulative project requirements
+├── architecture.md          # Current system architecture
+├── diagrams/                # Architecture diagrams
+├── user-guide.md            # User documentation
+└── api-reference.md         # API documentation
+```
+
+### Feature Workspace (temporary, per-feature)
 ```
 workflow/
 └── <feature-slug>/
     ├── 00-feature/
     │   └── description.md          # Original feature request
     ├── 01-requirements/
-    │   ├── requirements.md         # Requirements document
+    │   ├── requirements.md         # Requirements (seeded from docs/)
     │   ├── reviews/                # Review history
     │   └── status.json             # Phase status
     ├── 02-architecture/
-    │   ├── architecture.md         # Architecture design
-    │   ├── diagrams/               # Technical diagrams
+    │   ├── architecture.md         # Architecture (seeded from docs/)
+    │   ├── diagrams/               # Diagrams (seeded from docs/)
     │   ├── reviews/
     │   └── status.json
     ├── 03-implementation/
@@ -79,8 +100,8 @@ workflow/
     │   ├── reviews/
     │   └── status.json
     ├── 05-documentation/
-    │   ├── user-docs.md            # User documentation
-    │   ├── api-docs.md             # API documentation
+    │   ├── user-docs.md            # User docs (seeded from docs/)
+    │   ├── api-docs.md             # API docs (seeded from docs/)
     │   ├── reviews/
     │   └── status.json
     └── workflow-state.json         # Overall workflow state
@@ -120,6 +141,7 @@ workflow/
 - Commit after each phase: `[workflow] <phase>: <summary>`
 - PR created when documentation phase completes
 - Human reviews PR before merge
+- After merge: `/workflow-finalize` publishes docs and cleans up workspace
 
 ### Human Escalation
 After 4 iterations without approval:
@@ -174,6 +196,7 @@ Ensure you're using the correct command syntax:
 /workflow-approve <slug>           # Force approve
 /workflow-reset <slug> [phase]     # Reset phase(s)
 /workflow-cancel <slug>            # Cancel workflow
+/workflow-finalize <slug>          # Publish docs, clean up workspace
 ```
 
 ### Restoring Cancelled Workflows

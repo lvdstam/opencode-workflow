@@ -141,6 +141,7 @@ should keep both files in sync, but if they diverge, trust `workflow-state.json`
 ### Workflow Status
 - `in_progress` - Actively being worked on
 - `completed` - All phases done, PR created
+- `finalized` - Docs published to `docs/`, workspace deleted (terminal state)
 - `escalated` - Waiting for human intervention
 - `abandoned` - Workflow cancelled (legacy, use `cancelled`)
 - `cancelled` - Workflow explicitly cancelled by user
@@ -163,6 +164,52 @@ in_review → escalated (when iterations >= max_iterations, i.e., after 4th iter
 escalated → in_progress (when human provides guidance)
 escalated → approved (when human overrides)
 ```
+
+### Workflow-Level Transitions
+
+```
+in_progress → completed (all 5 phases approved, PR created)
+completed → finalized (docs published to docs/, workspace deleted via /workflow-finalize)
+in_progress → escalated (phase hits max iterations)
+escalated → in_progress (human provides guidance)
+in_progress → cancelled (user runs /workflow-cancel)
+```
+
+Note: `finalized` is a terminal state. The `workflow-state.json` file is deleted
+during finalization, so this status only exists briefly before the file is removed.
+The finalized state is recorded in the git commit history.
+
+## Documentation Mapping
+
+The workflow uses a **copy-edit-publish** pattern for documentation files:
+
+### Seeding (workflow-start)
+
+Central docs are copied into the workspace as starting points:
+
+| Central (source)         | Workspace (destination)                              |
+|--------------------------|------------------------------------------------------|
+| `docs/requirements.md`  | `workflow/<slug>/01-requirements/requirements.md`    |
+| `docs/architecture.md`  | `workflow/<slug>/02-architecture/architecture.md`    |
+| `docs/diagrams/*`       | `workflow/<slug>/02-architecture/diagrams/`           |
+| `docs/user-guide.md`    | `workflow/<slug>/05-documentation/user-docs.md`      |
+| `docs/api-reference.md` | `workflow/<slug>/05-documentation/api-docs.md`       |
+
+If `docs/` doesn't exist (first workflow), creators start from their templates.
+
+### Finalization (workflow-finalize)
+
+Updated workspace docs are published back to central:
+
+| Workspace (source)                                    | Central (destination)      |
+|-------------------------------------------------------|----------------------------|
+| `workflow/<slug>/01-requirements/requirements.md`     | `docs/requirements.md`     |
+| `workflow/<slug>/02-architecture/architecture.md`     | `docs/architecture.md`     |
+| `workflow/<slug>/02-architecture/diagrams/*`          | `docs/diagrams/`           |
+| `workflow/<slug>/05-documentation/user-docs.md`       | `docs/user-guide.md`       |
+| `workflow/<slug>/05-documentation/api-docs.md`        | `docs/api-reference.md`    |
+
+After publishing, the entire `workflow/<slug>/` directory is deleted.
 
 ## Update Patterns
 
@@ -272,7 +319,7 @@ If state file is corrupted or invalid:
 A valid `workflow-state.json` must have:
 - `feature` (string, non-empty)
 - `current_phase` (string, valid phase name)
-- `status` (string, one of: in_progress, completed, escalated, abandoned, cancelled)
+- `status` (string, one of: in_progress, completed, finalized, escalated, abandoned, cancelled)
 - `phases` (object with all 5 phases)
 
 A valid `status.json` must have:
